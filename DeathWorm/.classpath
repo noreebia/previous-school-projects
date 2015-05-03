@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/sangmyeong/Documents/newworkspace/first_matlab_test/matlabcontrol-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sangmyeong/Documents/newworkspace/first_matlab_test/core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/TG/Desktop/DeathWorm/core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/TG/Desktop/DeathWorm/matlabcontrol-4.1.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
