@@ -1,0 +1,321 @@
+
+import java.applet.*;
+import java.awt.*;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentListener;
+
+import javax.swing.*;
+
+public class asdf extends Applet implements ActionListener{
+	
+	Image myimage; //world map
+	Image myimage2;//lake
+	Image myimage3;//high school
+
+	Image myimage4;//animal hospital
+	Image myimage5, myimage51;//KU hospital
+	Image myimage6;//main library
+	Image myimage7;//College of Art & Design
+	Image myimage8;//Restio
+	Image myimage9, myimage91, myimage92, myimage93, myimage94, myimage95;//New Millenium Building
+	Image hall1,hall2,hall3;// memorialhall
+	Image studenthall1, studenthall2;//studenthall
+	Image ifvoid;
+	Image sdorm, sdorm1, sdorm2, sdorm3;
+	Image view;//view of lake
+	
+
+	Button Flip, Hospital, Ilgam, worldmap, library, backward, forward, memorialhall, studenthall, highschool, dorm, Lakeview;
+	String message;
+
+	int t=0;
+	public void init()
+	{
+		this.setSize(1920, 1080);
+		setLayout(null);
+
+		Flip = new Button("New Milleniium Building");
+		Flip.setBounds(900, 170, 150, 20);
+		Flip.addActionListener(this);
+		add(Flip);		
+		
+		Hospital = new Button("Konkuk Hospital");
+		Hospital.setBounds(250, 700, 100, 20);
+		Hospital.addActionListener(this);
+		add(Hospital);
+		
+		
+		Ilgam = new Button("Lake Ilgam");
+		Ilgam.setBounds(780, 700, 80, 20);
+		Ilgam.addActionListener(this);
+		add(Ilgam);
+		
+		worldmap = new Button("Konkuk University Map");
+		worldmap.setBounds(10, 10, 130, 20);
+		worldmap.addActionListener(this);
+		add(worldmap);
+		
+		library = new Button("Sang-huh Memorial Library");
+		library.setBounds(400,500, 160, 20);
+		library.addActionListener(this);
+		add(library);
+		
+		backward = new Button("뒤로");
+		backward.setBounds(10,40, 30, 970);
+		backward.addActionListener(this);
+		add(backward);
+		
+		forward = new Button("앞으로");
+		forward.setBounds(1855, 10, 40, 1000);
+		forward.addActionListener(this);
+		add(forward);
+		
+		memorialhall = new Button("Sang-huh Memorial Hall");
+		memorialhall.setBounds(520, 400, 160, 20);
+		memorialhall.addActionListener(this);
+		add(memorialhall);
+		
+		studenthall = new Button("Student Hall");
+		studenthall.setBounds(970,480, 90, 20);
+		studenthall.addActionListener(this);
+		add(studenthall);
+
+		highschool = new Button("Sibling High School");
+		highschool.setBounds(1250,850, 130, 20);
+		highschool.addActionListener(this);
+		add(highschool);
+		
+		dorm = new Button("Student Dormitories");
+		dorm.setBounds(1050,900, 130, 20);
+		dorm.addActionListener(this);
+		add(dorm);
+		
+		Lakeview = new Button("Enjoy the View of the Lake");
+		Lakeview.setBounds(800, 420, 170, 20);
+		Lakeview.addActionListener(this);
+		add(Lakeview);
+		
+		myimage = getImage(getCodeBase(), "world map.jpg");
+		myimage2 = getImage(getCodeBase(), "SAM_0491.jpg"); // lake
+		myimage3 = getImage(getCodeBase(), "SAM_0489.jpg"); //high school
+		myimage4 = getImage(getCodeBase(), "SAM_0492.jpg");// animal hospital
+		myimage5 = getImage(getCodeBase(), "SAM_0499.jpg");// KU hospital
+		myimage51 = getImage(getCodeBase(),"20130604_161513.jpg");
+		myimage6 = getImage(getCodeBase(), "SAM_0501.jpg");// main library
+		myimage7 = getImage(getCodeBase(), "SAM_0507.jpg");// CAD
+		myimage8 = getImage(getCodeBase(), "SAM_0508.jpg");// Restio
+		myimage9 = getImage(getCodeBase(), "SAM_0516.jpg");// New Millenium Building
+		myimage91 = getImage(getCodeBase(), "20130605_190422.jpg");
+		myimage92 = getImage(getCodeBase(), "20130605_190428.jpg");
+		myimage93 = getImage(getCodeBase(), "20130605_190456.jpg");
+		myimage94 = getImage(getCodeBase(), "20130605_190617.jpg");
+		myimage95 = getImage(getCodeBase(), "20130605_190654.jpg");
+		hall1 = getImage(getCodeBase(), "20130604_160951.jpg");
+		hall2 = getImage(getCodeBase(), "20130604_161005.jpg");
+		hall3 = getImage(getCodeBase(), "20130604_161015.jpg");
+		studenthall1 = getImage(getCodeBase(),"20130605_190212.jpg" );
+		studenthall2 = getImage(getCodeBase(),"20130605_190307.jpg" );
+		sdorm = getImage(getCodeBase(),"SAM_0487.jpg" );
+		sdorm1 = getImage(getCodeBase(),"SAM_0486.jpg" );
+		sdorm2= getImage(getCodeBase(),"SAM_0485.jpg" );
+		sdorm3 = getImage(getCodeBase(),"SAM_0484.jpg" );
+		ifvoid = getImage(getCodeBase(), "else.jpg");
+		view = getImage(getCodeBase(), "20130605_190746.jpg");
+
+
+	}
+	
+	public void paint(Graphics g)
+	{	
+
+		if(t  == 0)
+		{
+		g.drawImage(myimage, 0, 0 , this);
+		}
+
+		else if(t  ==10 )
+		{
+		g.drawImage(myimage2, 0, 0,1920, 1080,0,0, myimage2.getWidth(this), myimage2.getHeight(this), this);
+		}
+		else if(t  ==20 )
+		{
+		g.drawImage(myimage3, 0, 0,1920, 1080,0,0, myimage3.getWidth(this), myimage3.getHeight(this), this);
+		}
+		else if(t  ==30 )
+		{
+		g.drawImage(myimage4, 0, 0, this);
+		}
+		else if(t  ==40 )
+		{
+		g.drawImage(myimage5, 0, 0,1920, 1080,0,0, myimage5.getWidth(this), myimage5.getHeight(this), this);
+		}
+		else if(t  ==41 )
+		{
+		g.drawImage(myimage51, 150, 0,150+3264/(2448/1080), 2448/(2448/1080),0,0, myimage51.getWidth(this), myimage51.getHeight(this), this);
+		}
+		else if(t  ==50 )
+		{
+		g.drawImage(myimage6, 0, 0,1920, 1080,0,0, myimage6.getWidth(this), myimage6.getHeight(this), this);
+		}
+		else if(t  ==60 )
+		{
+		g.drawImage(myimage7, 0, 0, this);
+		}
+		else if(t  ==70 )
+		{
+		g.drawImage(myimage8, 0, 0, this);
+		}
+		else if(t  == 80 )
+		{
+		g.drawImage(myimage9, 600, 0,600+myimage9.getWidth(this)/2, myimage9.getHeight(this)/2,0,0, myimage9.getWidth(this), myimage9.getHeight(this), this);
+		}
+		else if(t  == 81 )
+		{
+		g.drawImage(myimage91, 600, 0,600+2448/(3264/1080), 3264/(3264/1080),0,0, myimage91.getWidth(this), myimage91.getHeight(this), this);
+		}
+		else if(t  == 82 )
+		{
+		g.drawImage(myimage92, 100, 0,100+3264/2, 2448/2,0,0, myimage92.getWidth(this), myimage92.getHeight(this), this);
+		}
+		else if(t  == 83 )
+		{
+		g.drawImage(myimage93, 600, 0,600+2448/(3264/1080), 3264/(3264/1080),0,0, myimage93.getWidth(this), myimage93.getHeight(this), this);
+		}
+		else if(t  == 84 )
+		{
+		g.drawImage(myimage94, 120, 0,120+3264/(2448/1080), 2448/(2448/1080),0,0, myimage94.getWidth(this), myimage94.getHeight(this), this);
+		}
+		else if(t  == 85 )
+		{
+		g.drawImage(myimage95, 600, 0,600+2448/(3264/1080), 3264/(3264/1080),0,0, myimage95.getWidth(this), myimage95.getHeight(this), this);
+		}
+		else if(t ==90)
+		{
+		g.drawImage(hall1, 150, 0 ,150+ 3264/(2448/1080), 2448/(2448/1080),0,0, hall1.getWidth(this), hall1.getHeight(this), this);
+		}
+		else if(t ==91)
+		{
+		g.drawImage(hall2, 150, 0 ,150+ 3264/(2448/1080), 2448/(2448/1080),0,0, hall2.getWidth(this), hall2.getHeight(this), this);
+		}
+		else if(t ==92)
+		{
+		g.drawImage(hall3, 150, 0 ,150+ 3264/(2448/1080), 2448/(2448/1080),0,0, hall3.getWidth(this), hall3.getHeight(this), this);
+		}
+		else if(t == 100)
+		{
+		g.drawImage(studenthall1, 150, 0 ,150+ 3264/(2448/1080), 2448/(2448/1080),0,0, studenthall1.getWidth(this), studenthall1.getHeight(this), this);	
+		}
+		else if(t == 101)
+		{
+		g.drawImage(studenthall2, 150, 0 ,150+ 3264/(2448/1080), 2448/(2448/1080),0,0, studenthall2.getWidth(this), studenthall2.getHeight(this), this);	
+		}
+		else if (t == 110)
+		{
+		g.drawImage(sdorm, 0, 0,1920, 1080,0,0, sdorm.getWidth(this), sdorm.getHeight(this), this);	
+		}
+		else if (t == 111)
+		{
+		g.drawImage(sdorm1, 0, 0,1920, 1080,0,0, sdorm1.getWidth(this), sdorm1.getHeight(this), this);	
+		}
+		else if (t == 112)
+		{
+		g.drawImage(sdorm2, 0, 0,1920, 1080,0,0, sdorm2.getWidth(this), sdorm2.getHeight(this), this);	
+		}
+		else if (t == 113)
+		{
+		g.drawImage(sdorm3, 0, 0,1920, 1080,0,0, sdorm3.getWidth(this), sdorm3.getHeight(this), this);	
+		}
+		else if (t == 120)
+		{
+		g.drawImage(view, 150, 0 ,150+ 3264/(2448/1080), 2448/(2448/1080),0,0, view.getWidth(this), view.getHeight(this), this);		
+		}
+		else
+		{
+		g.drawImage(ifvoid, 0, 0, this);
+		}
+
+		if( t == 0)
+		{
+			Flip.setVisible(true);
+			Hospital.setVisible(true);
+			Ilgam.setVisible(true);
+			library.setVisible(true);
+			memorialhall.setVisible(true);
+			studenthall.setVisible(true);
+			highschool.setVisible(true);
+			dorm.setVisible(true);
+			Lakeview.setVisible(true);
+			backward.setVisible(false);
+			forward.setVisible(false);
+		}
+		else if ( t != 0)
+		{
+			Flip.setVisible(false);
+			Hospital.setVisible(false);
+			Ilgam.setVisible(false);
+			library.setVisible(false);
+			memorialhall.setVisible(false);
+			studenthall.setVisible(false);
+			highschool.setVisible(false);
+			dorm.setVisible(false);
+			Lakeview.setVisible(false);
+			backward.setVisible(true);
+			forward.setVisible(true);
+		}
+	}
+	
+	public void actionPerformed(ActionEvent e)
+	{
+	if(e.getSource() == Flip)
+	{
+		t = 80;
+	}
+	if(e.getSource() == Hospital)
+	{
+		t = 40;
+	}
+	if(e.getSource() == Ilgam)
+	{
+		t =10;
+	}
+	if( e.getSource() == worldmap)
+	{
+		t = 0;
+	}
+	if(e.getSource() == library)
+	{
+		t = 50;
+	}
+	if(e.getSource() == backward)
+	{
+		t--;
+	}
+	if(e.getSource() == forward)
+	{
+		t++;
+	}
+	if(e.getSource() == memorialhall)
+	{
+		t = 90;
+	}
+	if(e.getSource() == studenthall)
+	{
+		t = 100;
+	}
+	if(e.getSource() == highschool)
+	{
+		t = 20;
+	}
+	if(e.getSource() == dorm)
+	{
+		t = 110;
+	}
+	if(e.getSource() == Lakeview)
+	{
+		t = 120;
+	}
+	repaint();
+	}
+}
