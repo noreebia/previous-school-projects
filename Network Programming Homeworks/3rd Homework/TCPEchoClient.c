@@ -47,7 +47,7 @@ int main(int argc, char *argv[]){
 		DieWithError("send() sent a different number of bytes than expected");
 
 	totalBytesRcvd = 0;
-	printf("Received: ");
+	printf("Received from server: ");
 	while(totalBytesRcvd < strlen("hi")){
 		if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0)
 			DieWithError("recv failed or connection closed prematurely");
@@ -67,9 +67,8 @@ int main(int argc, char *argv[]){
 	}
 	*/
 	while(strcmp(echoString, "/quit") != 0){
-		printf("Send to server: ");
+		printf("\nSend to server: ");
 		scanf("%s", echoString);
-		printf("typed in %s\n", echoString);		
 
 		echoStringLen = strlen(echoString);
 		if( send(sock, echoString, echoStringLen,0) != echoStringLen){	
@@ -89,9 +88,9 @@ int main(int argc, char *argv[]){
 		memset(echoBuffer, 0, RCVBUFSIZE);
 		if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0)
 			DieWithError("recv failed or connection closed prematurely");
-		printf("Received from server:%s\n",echoBuffer);
+		printf("Received from server: %s\n",echoBuffer);
 	}
-	printf("\n");
+	printf("\nClosing socket.\nExiting program.\n");
 	close(sock);
 	exit(0);
 }

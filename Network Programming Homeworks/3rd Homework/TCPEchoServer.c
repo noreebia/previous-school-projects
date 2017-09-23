@@ -49,14 +49,16 @@ void main(){
 		printf("listening again\n");
 	}
 	*/
-	clntLen = sizeof(echoClntAddr);
+	while(1){
+		clntLen = sizeof(echoClntAddr);
 	
-	if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
-		DieWithError("accept() failed");
+		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
+			DieWithError("accept() failed");
 
-	printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
-	printf("port: %hu\n", ntohs(echoClntAddr.sin_port));
+		printf("Client IP : %s\n", inet_ntoa(echoClntAddr.sin_addr));
+		printf("Port : %hu\n", ntohs(echoClntAddr.sin_port));
 
-	HandleTCPClient(clntSock);
-	printf("listening again\n");
+		HandleTCPClient(clntSock);
+		printf("Listening again.\n");
+	}
 }

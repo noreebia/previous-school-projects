@@ -11,14 +11,13 @@ void HandleTCPClient(int clntSocket){
 	char *connectionInitString = "hi";
 	int recvMsgSize;
 
-	printf("start of handletcpclient \n");
 	//clear the echoBuffer 
-
+	memset(echoBuffer, 0, RCVBUFSIZE);
 	
 	if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) <0)
 		DieWithError("recv() failed");
 	
-	printf("Received from client:%s\n",echoBuffer);
+	printf("Received from client: %s\n",echoBuffer);
 
 	if( strcmp(echoBuffer, "hello") == 0){
 		if(send(clntSocket, connectionInitString, strlen(connectionInitString), 0) < 0){
@@ -27,7 +26,7 @@ void HandleTCPClient(int clntSocket){
 		printf("Sent to client: %s\n", connectionInitString);
 	}	
 	
-	printf("commencing echo chat.\n\n");
+	printf("Commencing echo chat.\n\n");
 
 	/*
 	while(recvMsgSize > 0){		
@@ -43,14 +42,14 @@ void HandleTCPClient(int clntSocket){
 	while( recvMsgSize > 0){
 		if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) <0)
 			DieWithError("recv() failed");	
-		printf("Received from client:%s\n", echoBuffer);
+		printf("Received from client: %s\n", echoBuffer);
 
 		if(send(clntSocket, echoBuffer, recvMsgSize, 0) != recvMsgSize)
 			DieWithError("send() failed");
-		printf("Sent to client:%s\n", echoBuffer);
+		printf("Sent to client: %s\n\n", echoBuffer);
 
 		memset(echoBuffer, 0, RCVBUFSIZE);
 	}
-	printf("end of handtcpclient \n");
+	printf("Closing socket.\n");
 	close(clntSocket);
 }
