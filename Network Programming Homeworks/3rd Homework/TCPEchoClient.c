@@ -26,26 +26,29 @@ int main(int argc, char *argv[]){
 	echoServAddr.sin_family = AF_INET;
 	echoServAddr.sin_addr.s_addr = inet_addr(servIP);
 	echoServAddr.sin_port = htons(echoServPort);
-
-	printf("Server ip: %s\n", servIP);
+	
+	/* Display IP and port of server */
+	printf("Server ip: %s\n", inet_ntoa(echoServAddr.sin_addr));
+	//printf("Server ip: %s\n", servIP);
 	printf("Port: %hu\n", htons(echoServPort));
 	
+	/* Connect to server */
 	if(connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))<0)
 	{
 		DieWithError("connect() failed");
 	}
-	else{
-		printf("Connected to server.\n");
-	}
 
-	//echoString = "hello";
+	/* Set value of echoString to "hello" */
 	strcpy(echoString, "hello");
 	echoStringLen = strlen(echoString);
-	printf("Sent to server: %s\n", echoString);
 
+	/* Send "hello" to server */
 	if(send(sock, echoString, echoStringLen, 0) != echoStringLen)
 		DieWithError("send() sent a different number of bytes than expected");
+	
+	printf("Sent to server: %s\n", echoString);
 
+	/* Receive "hi" from server */
 	totalBytesRcvd = 0;
 	printf("Received from server: ");
 	while(totalBytesRcvd < strlen("hi")){
@@ -55,28 +58,24 @@ int main(int argc, char *argv[]){
 		echoBuffer[bytesRcvd] = '\0';
 		printf("%s\n", echoBuffer);		
 	}
-	/*
-	totalBytesRcvd = 0;
-	printf("Received: ");
-	while(totalBytesRcvd < echoStringLen){
-		if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE - 1, 0)) <= 0)
-			DieWithError("recv failed or connection closed prematurely");
-		totalBytesRcvd += bytesRcvd;
-		echoBuffer[bytesRcvd] = '\0';
-		printf(echoBuffer);		
-	}
-	*/
+	
+	printf("Commencing echo chat.\n");
+
 	while(strcmp(echoString, "/quit") != 0){
 		printf("\nSend to server: ");
+		/* Read string */
 		scanf("%s", echoString);
-
 		echoStringLen = strlen(echoString);
+
+		/* Send inputted string to server */
 		if( send(sock, echoString, echoStringLen,0) != echoStringLen){	
 			DieWithError("recv() failed or connection closed prematurely");
 		}
 		
+		/* Clear the buffer that stores the string that will be sent to the server */
 		memset(echoBuffer, 0, RCVBUFSIZE);
 
+		/* Receive echoed string from server */
 		totalBytesRcvd = 0;
 		while(totalBytesRcvd < echoStringLen){
         	if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0){
@@ -86,12 +85,8 @@ int main(int argc, char *argv[]){
 			echoBuffer[bytesRcvd] = '\0';
        		printf("Received from server: %s\n", echoBuffer);
 		}
-		/*
-		if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0)
-			DieWithError("recv failed or connection closed prematurely");
-		printf("Received from server: %s\n",echoBuffer);
-		*/
 	}
+	/* Exit the program if "/quit" is entered as input */
 	printf("\nClosing socket.\nExiting program.\n");
 	close(sock);
 	exit(0);

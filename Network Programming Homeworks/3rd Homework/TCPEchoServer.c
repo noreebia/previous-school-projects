@@ -34,21 +34,7 @@ void main(){
 
 	if(listen(servSock, MAXPENDING) < 0)
 		DieWithError("listen() failed");
-	/*
-	for(;;)
-	{
-		clntLen = sizeof(echoClntAddr);
-	
-		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
-			DieWithError("accept() failed");
 
-		printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
-		printf("port: %hu\n", ntohs(echoClntAddr.sin_port));
-
-		HandleTCPClient(clntSock);
-		printf("listening again\n");
-	}
-	*/
 	while(1){
 		clntLen = sizeof(echoClntAddr);
 	
@@ -56,7 +42,7 @@ void main(){
 			DieWithError("accept() failed");
 
 		printf("Client IP : %s\n", inet_ntoa(echoClntAddr.sin_addr));
-		printf("Port : %hu\n", ntohs(echoClntAddr.sin_port));
+		printf("Port : %hu\n", htons(echoClntAddr.sin_port));
 
 		HandleTCPClient(clntSock);
 		printf("Listening again.\n");
