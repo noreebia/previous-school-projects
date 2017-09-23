@@ -27,15 +27,15 @@ int main(int argc, char *argv[]){
 	echoServAddr.sin_addr.s_addr = inet_addr(servIP);
 	echoServAddr.sin_port = htons(echoServPort);
 
-	printf("server ip: %s\n", servIP);
-	printf("port: %hu\n", htons(echoServPort));
+	printf("Server ip: %s\n", servIP);
+	printf("Port: %hu\n", htons(echoServPort));
 	
 	if(connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))<0)
 	{
 		DieWithError("connect() failed");
 	}
 	else{
-		printf("connected to server.\n");
+		printf("Connected to server.\n");
 	}
 
 	//echoString = "hello";
@@ -74,21 +74,23 @@ int main(int argc, char *argv[]){
 		if( send(sock, echoString, echoStringLen,0) != echoStringLen){	
 			DieWithError("recv() failed or connection closed prematurely");
 		}
-		/*
-		totalBytesRcvd = 0;
-	    printf("Received: ");
-		while(totalBytesRcvd < echoStringLen){
-        if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0)
-            DieWithError("recv failed or connection closed prematurely");
-		}
-        totalBytesRcvd += bytesRcvd;
-        echoBuffer[bytesRcvd] = '\0';
-        printf(echoBuffer);
-		*/
+		
 		memset(echoBuffer, 0, RCVBUFSIZE);
+
+		totalBytesRcvd = 0;
+		while(totalBytesRcvd < echoStringLen){
+        	if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0){
+				DieWithError("recv failed or connection closed prematurely");
+			}			
+        	totalBytesRcvd += bytesRcvd;
+			echoBuffer[bytesRcvd] = '\0';
+       		printf("Received from server: %s\n", echoBuffer);
+		}
+		/*
 		if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0)
 			DieWithError("recv failed or connection closed prematurely");
 		printf("Received from server: %s\n",echoBuffer);
+		*/
 	}
 	printf("\nClosing socket.\nExiting program.\n");
 	close(sock);
