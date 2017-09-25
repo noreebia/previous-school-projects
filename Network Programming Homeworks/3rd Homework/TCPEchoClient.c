@@ -12,12 +12,22 @@ void DieWithError(char *errorMessage);
 int main(int argc, char *argv[]){
 	int sock;
 	struct sockaddr_in echoServAddr;
-	unsigned short echoServPort = 7;
-	char *servIP = "127.0.0.1";
+	unsigned short echoServPort;
+	char servIP[20];
 	char echoString[RCVBUFSIZE];
 	char echoBuffer[RCVBUFSIZE];
 	unsigned int echoStringLen;
 	int bytesRcvd, totalBytesRcvd;
+
+	/* Display IP and port of server */
+	//printf("Server ip: %s\n", inet_ntoa(echoServAddr.sin_addr));
+	//printf("Server ip: %s\n", servIP);
+	//printf("Port: %hu\n", htons(echoServPort));
+
+	printf("Server IP: ");
+	scanf("%s", servIP);
+	printf("Port: ");
+	scanf("%hu", &echoServPort);
 
 	if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		DieWithError("socket() failed");
@@ -26,11 +36,6 @@ int main(int argc, char *argv[]){
 	echoServAddr.sin_family = AF_INET;
 	echoServAddr.sin_addr.s_addr = inet_addr(servIP);
 	echoServAddr.sin_port = htons(echoServPort);
-	
-	/* Display IP and port of server */
-	printf("Server ip: %s\n", inet_ntoa(echoServAddr.sin_addr));
-	//printf("Server ip: %s\n", servIP);
-	printf("Port: %hu\n", htons(echoServPort));
 	
 	/* Connect to server */
 	if(connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))<0)

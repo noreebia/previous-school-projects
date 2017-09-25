@@ -42,7 +42,7 @@ void main(){
 			DieWithError("accept() failed");
 
 		printf("Client IP : %s\n", inet_ntoa(echoClntAddr.sin_addr));
-		printf("Port : %hu\n", htons(echoClntAddr.sin_port));
+		printf("Port : %hu\n", ntohs(echoClntAddr.sin_port));
 
 		HandleTCPClient(clntSock);
 		printf("Listening again.\n");
