@@ -15,7 +15,7 @@ void main(){
 	int clntSock;
 	struct sockaddr_in echoServAddr;
 	struct sockaddr_in echoClntAddr;
-	unsigned short echoServPort = 7;
+	unsigned short echoServPort = 1080;
 	unsigned int clntLen;
 
 	if((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -45,6 +45,6 @@ void main(){
 		printf("Port : %hu\n", ntohs(echoClntAddr.sin_port));
 
 		HandleTCPClient(clntSock);
-		printf("Listening again.\n");
+		printf("Listening again.\n\n");
 	}
 }

@@ -24,6 +24,7 @@ int main(int argc, char *argv[]){
 	//printf("Server ip: %s\n", servIP);
 	//printf("Port: %hu\n", htons(echoServPort));
 
+	/* Get IP and port of server through input */
 	printf("Server IP: ");
 	scanf("%s", servIP);
 	printf("Port: ");
@@ -51,11 +52,11 @@ int main(int argc, char *argv[]){
 	if(send(sock, echoString, echoStringLen, 0) != echoStringLen)
 		DieWithError("send() sent a different number of bytes than expected");
 	
-	printf("Sent to server: %s\n", echoString);
+	printf("msg-> %s\n", echoString);
 
 	/* Receive "hi" from server */
 	totalBytesRcvd = 0;
-	printf("Received from server: ");
+	printf("msg<- ");
 	while(totalBytesRcvd < strlen("hi")){
 		if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0)
 			DieWithError("recv failed or connection closed prematurely");
@@ -66,9 +67,10 @@ int main(int argc, char *argv[]){
 	
 	printf("Commencing echo chat.\n");
 
+	/* Keep echo chatting as long as "/quit" is not entered */
 	while(strcmp(echoString, "/quit") != 0){
-		printf("\nSend to server: ");
-		/* Read string */
+		printf("\nmsg-> ");
+		/* Read string through input */
 		scanf("%s", echoString);
 		echoStringLen = strlen(echoString);
 
@@ -88,7 +90,7 @@ int main(int argc, char *argv[]){
 			}			
         	totalBytesRcvd += bytesRcvd;
 			echoBuffer[bytesRcvd] = '\0';
-       		printf("Received from server: %s\n", echoBuffer);
+       		printf("msg<- %s\n", echoBuffer);
 		}
 	}
 	/* Exit the program if "/quit" is entered as input */
