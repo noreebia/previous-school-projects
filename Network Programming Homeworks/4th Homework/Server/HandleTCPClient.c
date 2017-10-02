@@ -9,11 +9,11 @@ void DieWithError(char *errorMessage);
 
 void HandleTCPClient(int clntSocket){
 	char fileSize[RCVBUFSIZE];
-	int fileSizeInt;
+	int sizeOfFile;
 	char sendBuffer[RCVBUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
 	char fileName[RCVBUFSIZE];
-	int receivedMsgSize;
+	int recvMsgSize;
 	int receivedFileSize;
 	FILE *fp;
 
@@ -29,18 +29,20 @@ void HandleTCPClient(int clntSocket){
 		DieWithError("recv() failed");
 	}
 
-	fileSizeInt = atoi(fileSize);
+	sizeOfFile = atoi(fileSize);
 	
-	printf("file size that I will receive: %d", fileSizeInt);	
+	printf("file size that I will receive: %d\n", sizeOfFile);	
 
 	strcpy(sendBuffer, "acknowledged");
 
 	send(clntSocket, sendBuffer, RCVBUFSIZE,0);
 	
-	printf("sent acknowledgement");
+	printf("sent acknowledgement\n");
 
 	if((recvMsgSize = recv(clntSocket, fileName, RCVBUFSIZE, 0)) <0)
 		DieWithError("recv() failed");	
+
+	printf("received filename\n");
 
 	fp = fopen(fileName, "w");
 	if(fp == NULL)
@@ -49,12 +51,22 @@ void HandleTCPClient(int clntSocket){
 	}
 
 	receivedFileSize = 0;
-	while(receivedFileSize < fileSizeInt){		
-		if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
+	while(receivedFileSize < sizeOfFile){
+		printf("receiving...\n");		
+		if((recvMsgSize = recv(clntSocket, fileBuffer, sizeOfFile, 0)) <0)
 			DieWithError("recv() failed");	
+
 		fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
 		receivedFileSize += recvMsgSize;
 	}
+	
+	/*
+	if((recvMsgSize = recv(clntSocket, fileBuffer, sizeOfFile, 0)) <0)
+			DieWithError("recv() failed");	
+	*/
+	printf("%s", fileBuffer);
+	fwrite(fileBuffer, sizeof(char), sizeOfFile, fp);
+
 	printf("file received successfully");
 	fclose(fp);
 	close(clntSocket);

@@ -5,12 +5,20 @@
 #include <string.h>
 #include <unistd.h>
 
-#define RCVBUFSIZE 
+#define RCVBUFSIZE 32
+#define FILEBUFSIZE 1024
 
 int fsize(char* file);
 
 int main(int argc, char *argv[]){
-	printf("%d", fsize("test.txt"));	
+	char fileBuffer[FILEBUFSIZE];
+	char fileName[] = "test.txt";
+	int fileSize = fsize("test.txt");	
+	FILE *fp = fopen(fileName, "r");
+	
+	fread(fileBuffer, fileSize, 1, fp);
+	printf("%s", fileBuffer);
+	fclose(fp);
 	exit(0);
 }
 
