@@ -19,5 +19,6 @@ void HandleTCPClient(int clntSocket){
 		if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) <0)
 			DieWithError("recv() failed");
 	}
+	printf("closing socket");
 	close(clntSocket);
 }
