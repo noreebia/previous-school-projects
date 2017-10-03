@@ -8,41 +8,46 @@
 void DieWithError(char *errorMessage);
 
 void HandleTCPClient(int clntSocket){
-	char fileSize[RCVBUFSIZE];
-	int sizeOfFile;
+	char fileSizeInString[20];
+	int fileSize;
 	char sendBuffer[RCVBUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
-	char fileName[RCVBUFSIZE];
+	char fileName[256];
 	int recvMsgSize;
 	int receivedFileSize;
+	char msgType;
 	FILE *fp;
 
 	//clear the echoBuffer 
 	//memset(recvBuffer, 0, RCVBUFSIZE);
 	
-	memset(fileSize, 0, RCVBUFSIZE);
-	memset(fileName, 0, RCVBUFSIZE);
+	memset(fileSizeInString, 0, 20);
+	memset(fileName, 0, 256);
 	memset(fileBuffer, 0, FILEBUFSIZE);
 
-	if((recvMsgSize = recv(clntSocket, fileSize, RCVBUFSIZE, 0)) <0)
+	if((recvMsgSize = recv(clntSocket, &msgType, 1, 0)) <0)
 	{
 		DieWithError("recv() failed");
 	}
 
-	sizeOfFile = atoi(fileSize);
+	printf("Received msgtype from client:%c", msgType);
+	
+	if((recvMsgSize = recv(clntSocket, fileName, 256, 0)) <0)
+		DieWithError("recv() failed");	
 
-	printf("file size that I will receive: %d\n", sizeOfFile);	
+	printf("received filename: %s 1\n", fileName);
+
+	if((recvMsgSize = recv(clntSocket, fileSizeInString, 20, 0)) <0)
+	{
+		DieWithError("recv() failed");
+	}
+	fileSize = atoi(fileSizeInString);
+	printf("file size that client will send: %d\n", fileSize);	
 
 	strcpy(sendBuffer, "acknowledged");
-
 	send(clntSocket, sendBuffer, RCVBUFSIZE,0);
 	
 	printf("sent acknowledgement\n");
-
-	if((recvMsgSize = recv(clntSocket, fileName, RCVBUFSIZE, 0)) <0)
-		DieWithError("recv() failed");	
-
-	printf("received filename\n");
 
 	fp = fopen(fileName, "wb");
 	if(fp == NULL)
@@ -51,7 +56,7 @@ void HandleTCPClient(int clntSocket){
 	}
 	
 	receivedFileSize = 0;
-	while(receivedFileSize < sizeOfFile){
+	while(receivedFileSize < fileSize){
 		printf("receiving...\n");		
 		if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
 			DieWithError("recv() failed");	
@@ -62,7 +67,7 @@ void HandleTCPClient(int clntSocket){
 	}
 	
 	printf("%s", fileBuffer);
-	fwrite(fileBuffer, sizeof(char), sizeOfFile, fp);
+	fwrite(fileBuffer, sizeof(char), fileSize, fp);
 
 	printf("file received successfully");
 	/*

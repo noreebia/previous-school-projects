@@ -29,6 +29,10 @@ int main(int argc, char *argv[])
 	if((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		DieWithError("socket() failed");
 
+	if (setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
+	    DieWithError("setsockopt(SO_REUSEADDR) failed");
+
+
 	memset(&echoServAddr, 0, sizeof(echoServAddr));
 	echoServAddr.sin_family = AF_INET;
 	echoServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
