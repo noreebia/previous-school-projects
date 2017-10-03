@@ -30,7 +30,7 @@ void HandleTCPClient(int clntSocket){
 	}
 
 	sizeOfFile = atoi(fileSize);
-	
+
 	printf("file size that I will receive: %d\n", sizeOfFile);	
 
 	strcpy(sendBuffer, "acknowledged");
@@ -44,24 +44,25 @@ void HandleTCPClient(int clntSocket){
 
 	printf("received filename\n");
 
-	fp = fopen(fileName, "w");
+	fp = fopen(fileName, "wb");
 	if(fp == NULL)
 	{
 		DieWithError("File open error");
 	}
-
+	
 	receivedFileSize = 0;
 	while(receivedFileSize < sizeOfFile){
 		printf("receiving...\n");		
-		if((recvMsgSize = recv(clntSocket, fileBuffer, sizeOfFile, 0)) <0)
+		if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
 			DieWithError("recv() failed");	
-
-		fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
+		
+		printf("%d",recvMsgSize);
+		//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
 		receivedFileSize += recvMsgSize;
 	}
 	
 	/*
-	if((recvMsgSize = recv(clntSocket, fileBuffer, sizeOfFile, 0)) <0)
+	if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
 			DieWithError("recv() failed");	
 	*/
 	printf("%s", fileBuffer);

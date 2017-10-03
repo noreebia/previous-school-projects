@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
 	if(send(sock, fileSize, strlen(fileSize), 0) != strlen(fileSize))
 		DieWithError("send() sent a different number of bytes than expected");
 	
-	printf("sent file size: %d\n", sizeOfFile);
+	printf("file size to send: %d\n", sizeOfFile);
 
 	if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE - 1, 0)) <= 0)
 		DieWithError("recv failed or connection closed prematurely");
@@ -78,22 +78,28 @@ int main(int argc, char *argv[]){
 
 	printf("sent filename\n");
 
-	fp = fopen(fileName,"r");
+	fp = fopen(fileName,"rb");
    	fread(fileBuffer, sizeOfFile, 1, fp);
 	fclose(fp);
 		
-	printf("%s", fileBuffer);
+	printf("%s, length:%d", fileBuffer, strlen(fileBuffer));
+	
+	
 	/*
-	if(send(sock, fileBuffer, sizeOfFile, 0) != sizeOfFile)
+	if(totalBytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0) != FILEBUFSIZE)
 		DieWithError("send() sent a different number of bytes than expected");
 	*/
+	
 	totalBytesSent = 0;
-	while(bytesSent < sizeOfFile){
-		if(bytesSent = send(sock, fileBuffer, sizeOfFile, 0) != sizeOfFile)
+	while(totalBytesSent < sizeOfFile){
+
+		if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 			DieWithError("send() sent a different number of bytes than expected");
+		printf("%d\n", bytesSent);
 		totalBytesSent += bytesSent;
 	}
 	
+	printf("total bytes sent: %d", totalBytesSent);
 	printf("sent file contents");
 	/*
 	totalBytesRcvd = 0;
@@ -107,8 +113,13 @@ int main(int argc, char *argv[]){
 	}
 	*/
 	printf("\n");
-	close(sock);
-	exit(0);
+
+	for(;;)
+	{
+		sleep(10000000);
+	}
+	//close(sock);
+	//exit(0);
 }
 
 int fSize(char* file) {
