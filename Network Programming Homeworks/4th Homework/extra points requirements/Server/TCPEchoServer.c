@@ -40,14 +40,17 @@ int main(int argc, char *argv[])
 	if(listen(servSock, MAXPENDING) < 0)
 		DieWithError("listen() failed");
 
-	//while(1){
+	while(1){
 		clntLen = sizeof(echoClntAddr);
 	
 		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
 			DieWithError("accept() failed");
 
-		printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));	
+		printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
 		HandleTCPClient(clntSock);
-	//}
+
+	}
+
+	
 }

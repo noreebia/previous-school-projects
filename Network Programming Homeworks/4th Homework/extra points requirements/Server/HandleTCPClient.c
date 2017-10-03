@@ -61,14 +61,19 @@ void HandleTCPClient(int clntSocket){
 		receivedFileSize += recvMsgSize;
 	}
 	
-	/*
-	if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
-			DieWithError("recv() failed");	
-	*/
 	printf("%s", fileBuffer);
 	fwrite(fileBuffer, sizeof(char), sizeOfFile, fp);
 
 	printf("file received successfully");
+	/*
+	strcpy(sendBuffer, "acknowledged");
+	send(clntSocket, sendBuffer, strlen(sendBuffer),0);
+	*/
+	if( send(clntSocket, sendBuffer, RCVBUFSIZE,0) != RCVBUFSIZE){
+		DieWithError("send() failed");
+	}
+
+	printf("sent acknowledgement\nclosing socket");
 	fclose(fp);
 	close(clntSocket);
 }

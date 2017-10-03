@@ -41,13 +41,16 @@ int main(int argc, char *argv[])
 		DieWithError("listen() failed");
 
 	while(1){
-	clntLen = sizeof(echoClntAddr);
+		clntLen = sizeof(echoClntAddr);
 	
 		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
 			DieWithError("accept() failed");
 
-		printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));	
+		printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
 		HandleTCPClient(clntSock);
+
 	}
+
+	
 }
