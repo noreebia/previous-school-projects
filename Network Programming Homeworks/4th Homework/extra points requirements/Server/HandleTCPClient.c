@@ -49,11 +49,15 @@ void HandleTCPClient(int clntSocket){
 		if(msgType == 'p'){
 			printf("Received msgtype from client:%c\n", msgType);
 	
+
+			//receive name of file clients wants to upload
 			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
 				DieWithError("recv() failed");	
 
 			printf("received filename: %s 1\n", fileName);
 
+
+			//receive size of file client wants to upload
 			if((bytesRcvd = recv(clntSocket, fileSizeInString, 20, 0)) <0)
 			{
 				DieWithError("recv() failed");
@@ -61,6 +65,7 @@ void HandleTCPClient(int clntSocket){
 			fileSize = atoi(fileSizeInString);
 			printf("file size that client will send: %d\n", fileSize);	
 
+			//send ack to client
 			strcpy(stringBuffer, "acknowledged");
 			if( send(clntSocket, stringBuffer, RCVBUFSIZE,0) != RCVBUFSIZE){
 				DieWithError("send() failed");
@@ -86,6 +91,7 @@ void HandleTCPClient(int clntSocket){
 			}
 			*/
 
+			//receive file contents
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < fileSize){
 				printf("receiving...\n");		
@@ -102,6 +108,7 @@ void HandleTCPClient(int clntSocket){
 			fclose(fp);
 			printf("file received successfully\n");
 
+			//send ack to signal successful file upload
 			if( send(clntSocket, stringBuffer, RCVBUFSIZE,0) != RCVBUFSIZE){
 				DieWithError("send() failed");
 			}
@@ -111,6 +118,7 @@ void HandleTCPClient(int clntSocket){
 		else if(msgType == 'g'){
 			printf("Received msgtype from client:%c\n", msgType);
 
+			//receive name of file client wants to download
 			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
 				DieWithError("recv() failed");	
 
@@ -128,16 +136,19 @@ void HandleTCPClient(int clntSocket){
   		 	fread(fileBuffer, fileSize, 1, fp);
 			fclose(fp);
 
-			if(  send(clntSocket, fileSizeInString, 20, 0) != 20)
+			//send size of file client wants to download
+			if(send(clntSocket, fileSizeInString, 20, 0) != 20)
 				DieWithError("send() sent a different number of bytes than expected");
 
 			printf("Sent file size to client: %s\n", fileSizeInString);
 
-			if(  (bytesRcvd = recv(clntSocket, stringBuffer, RCVBUFSIZE - 1, 0)) <= 0)
+			//receive ack from client
+			if( (bytesRcvd = recv(clntSocket, stringBuffer, RCVBUFSIZE - 1, 0)) <= 0)
 				DieWithError("recv failed or connection closed prematurely");
 		
 			printf("Received from client: %s\n", stringBuffer);
 
+			//sent contents of file to client
 			totalBytesSent = 0;
 			while(totalBytesSent < fileSize){
 			if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
@@ -150,6 +161,7 @@ void HandleTCPClient(int clntSocket){
 
 			printf("sent file contents to client:%s\n", fileBuffer);
 
+			//receive ack from client 
 			memset(stringBuffer, 0, RCVBUFSIZE);
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < strlen("acknowledged")){
