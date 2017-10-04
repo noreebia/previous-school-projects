@@ -7,78 +7,180 @@
 
 void DieWithError(char *errorMessage);
 
+int fSize(char* file);
+
 void HandleTCPClient(int clntSocket){
+	/*
 	char fileSizeInString[20];
 	int fileSize;
-	char sendBuffer[RCVBUFSIZE];
+	char stringBuffer[RCVBUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
 	char fileName[256];
 	int recvMsgSize;
-	int receivedFileSize;
+	char msgType;
+	FILE *fp;
+	int totalBytesSent, bytesSent;
+	int bytesRcvd, totalBytesRcvd;
+	*/
+
+	int fileSize;
+	//int recvMsgSize;
+	int totalBytesSent, bytesSent;
+	int bytesRcvd, totalBytesRcvd;
+	char fileSizeInString[20];
+	char fileName[256];
+	char stringBuffer[RCVBUFSIZE];
+	char fileBuffer[FILEBUFSIZE];
 	char msgType;
 	FILE *fp;
 
-	//clear the echoBuffer 
-	//memset(recvBuffer, 0, RCVBUFSIZE);
 	
-	memset(fileSizeInString, 0, 20);
-	memset(fileName, 0, 256);
-	memset(fileBuffer, 0, FILEBUFSIZE);
+	while(1){
+		memset(fileSizeInString, 0, 20);
+		memset(fileName, 0, 256);
+		memset(fileBuffer, 0, FILEBUFSIZE);
+		memset(stringBuffer, 0, RCVBUFSIZE);
 
-	if((recvMsgSize = recv(clntSocket, &msgType, 1, 0)) <0)
-	{
-		DieWithError("recv() failed");
-	}
+		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0)
+		{
+			DieWithError("recv() failed");
+		}
 
-	printf("Received msgtype from client:%c", msgType);
+		if(msgType == 'p'){
+			printf("Received msgtype from client:%c\n", msgType);
 	
-	if((recvMsgSize = recv(clntSocket, fileName, 256, 0)) <0)
-		DieWithError("recv() failed");	
+			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
+				DieWithError("recv() failed");	
 
-	printf("received filename: %s 1\n", fileName);
+			printf("received filename: %s 1\n", fileName);
 
-	if((recvMsgSize = recv(clntSocket, fileSizeInString, 20, 0)) <0)
-	{
-		DieWithError("recv() failed");
-	}
-	fileSize = atoi(fileSizeInString);
-	printf("file size that client will send: %d\n", fileSize);	
+			if((bytesRcvd = recv(clntSocket, fileSizeInString, 20, 0)) <0)
+			{
+				DieWithError("recv() failed");
+			}
+			fileSize = atoi(fileSizeInString);
+			printf("file size that client will send: %d\n", fileSize);	
 
-	strcpy(sendBuffer, "acknowledged");
-	send(clntSocket, sendBuffer, RCVBUFSIZE,0);
-	
-	printf("sent acknowledgement\n");
+			strcpy(stringBuffer, "acknowledged");
+			if( send(clntSocket, stringBuffer, RCVBUFSIZE,0) != RCVBUFSIZE){
+				DieWithError("send() failed");
+			}
 
-	fp = fopen(fileName, "wb");
-	if(fp == NULL)
-	{
-		DieWithError("File open error");
-	}
-	
-	receivedFileSize = 0;
-	while(receivedFileSize < fileSize){
-		printf("receiving...\n");		
-		if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
-			DieWithError("recv() failed");	
+			printf("sent to client:%s\n", stringBuffer);
+
+			fp = fopen(fileName, "wb");
+			if(fp == NULL)
+			{
+				DieWithError("File open error");
+			}
+			/*
+			receivedFileSize = 0;
+			while(receivedFileSize < fileSize){
+				printf("receiving...\n");		
+				if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
+					DieWithError("recv() failed");	
+				
+				printf("%d",recvMsgSize);
+				//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
+				receivedFileSize += recvMsgSize;
+			}
+			*/
+
+			totalBytesRcvd = 0;
+			while(totalBytesRcvd < fileSize){
+				printf("receiving...\n");		
+				if((bytesRcvd = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
+					DieWithError("recv() failed");	
+				
+				printf("bytes received:%d\n",bytesRcvd);
+				//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
+				totalBytesRcvd += bytesRcvd;
+			}
+			
+			printf("%s", fileBuffer);
+			fwrite(fileBuffer, sizeof(char), fileSize, fp);
+			fclose(fp);
+			printf("file received successfully\n");
+
+			if( send(clntSocket, stringBuffer, RCVBUFSIZE,0) != RCVBUFSIZE){
+				DieWithError("send() failed");
+			}
+
+			printf("sent to client:%s \nawaiting for operation\n", stringBuffer);
+		}
+		else if(msgType == 'g'){
+			printf("Received msgtype from client:%c\n", msgType);
+
+			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
+				DieWithError("recv() failed");	
+
+			printf("received filename: %s\n", fileName);			
+
+			fileSize = fSize(fileName);		
+			sprintf(fileSizeInString, "%d", fileSize);	
+
+			fp = fopen(fileName, "r");
+			if(fp == NULL){
+				DieWithError("No such file exists.");
+			}
+
+			memset(fileBuffer, 0, FILEBUFSIZE);
+  		 	fread(fileBuffer, fileSize, 1, fp);
+			fclose(fp);
+
+			if(  send(clntSocket, fileSizeInString, 20, 0) != 20)
+				DieWithError("send() sent a different number of bytes than expected");
+
+			printf("Sent file size to client: %s\n", fileSizeInString);
+
+			if(  (bytesRcvd = recv(clntSocket, stringBuffer, RCVBUFSIZE - 1, 0)) <= 0)
+				DieWithError("recv failed or connection closed prematurely");
 		
-		printf("%d",recvMsgSize);
-		//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
-		receivedFileSize += recvMsgSize;
-	}
-	
-	printf("%s", fileBuffer);
-	fwrite(fileBuffer, sizeof(char), fileSize, fp);
+			printf("Received from client: %s\n", stringBuffer);
 
-	printf("file received successfully");
-	/*
-	strcpy(sendBuffer, "acknowledged");
-	send(clntSocket, sendBuffer, strlen(sendBuffer),0);
-	*/
-	if( send(clntSocket, sendBuffer, RCVBUFSIZE,0) != RCVBUFSIZE){
-		DieWithError("send() failed");
-	}
+			totalBytesSent = 0;
+			while(totalBytesSent < fileSize){
+			if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+				DieWithError("send() sent a different number of bytes than expected");
+			
+			printf("Sending => ##########\n");
+			printf("bytes sent:%d\n", bytesSent);				
+			totalBytesSent += bytesSent;
+			}
 
-	printf("sent acknowledgement\nclosing socket");
-	fclose(fp);
+			printf("sent file contents to client:%s\n", fileBuffer);
+
+			memset(stringBuffer, 0, RCVBUFSIZE);
+			totalBytesRcvd = 0;
+			while(totalBytesRcvd < strlen("acknowledged")){
+				if((bytesRcvd = recv(clntSocket, stringBuffer, RCVBUFSIZE - 1, 0)) <= 0)
+					DieWithError("recv failed or connection closed prematurely");	
+
+				totalBytesRcvd += bytesRcvd;
+			}
+			printf("bytes received:%d, received content:%s\n", bytesRcvd, stringBuffer);
+			printf("awaiting for operation\n");
+		}
+	}
 	close(clntSocket);
+}
+
+
+int fSize(char* file) {
+  int size;
+  FILE* fh;
+
+  fh = fopen(file, "r"); //binary mode
+  if(fh != NULL){
+    if( fseek(fh, 0, SEEK_END) ){
+      fclose(fh);
+      return -1;
+    }
+
+    size = ftell(fh);
+    fclose(fh);
+    return size;
+  }
+
+  return -1; //error
 }
