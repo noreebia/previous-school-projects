@@ -10,21 +10,7 @@ void DieWithError(char *errorMessage);
 int fSize(char* file);
 
 void HandleTCPClient(int clntSocket){
-	/*
-	char fileSizeInString[20];
 	int fileSize;
-	char stringBuffer[RCVBUFSIZE];
-	char fileBuffer[FILEBUFSIZE];
-	char fileName[256];
-	int recvMsgSize;
-	char msgType;
-	FILE *fp;
-	int totalBytesSent, bytesSent;
-	int bytesRcvd, totalBytesRcvd;
-	*/
-
-	int fileSize;
-	//int recvMsgSize;
 	int totalBytesSent, bytesSent;
 	int bytesRcvd, totalBytesRcvd;
 	char fileSizeInString[20];
@@ -33,7 +19,28 @@ void HandleTCPClient(int clntSocket){
 	char fileBuffer[FILEBUFSIZE];
 	char msgType=0;
 	FILE *fp;
+
+	memset(stringBuffer, 0, RCVBUFSIZE);
+	if(recv(clntSocket, stringBuffer, RCVBUFSIZE, 0) <0){
+		DieWithError("recv() failed");
+	}
+
+	printf("Msg< %s\n", stringBuffer);
+
+	memset(stringBuffer, 0, RCVBUFSIZE);
+	strcpy(stringBuffer, "hi");
+	if(send(clntSocket, stringBuffer, RCVBUFSIZE, 0) != RCVBUFSIZE)
+		DieWithError("send() sent a different number of bytes than expected");
 	
+	printf("Msg> %s\n", stringBuffer);
+
+	memset(stringBuffer, 0, RCVBUFSIZE);
+	if(recv(clntSocket, stringBuffer, RCVBUFSIZE, 0) <0){
+		DieWithError("recv() failed");
+	}
+
+	printf("Msg< %s\n", stringBuffer);
+
 	while(msgType != 'e'){
 		memset(fileSizeInString, 0, 20);
 		memset(fileName, 0, 256);
@@ -41,8 +48,7 @@ void HandleTCPClient(int clntSocket){
 		memset(stringBuffer, 0, RCVBUFSIZE);
 
 		
-		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0)
-		{
+		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0){
 			DieWithError("recv() failed");
 		}
 		
@@ -100,11 +106,13 @@ void HandleTCPClient(int clntSocket){
 				
 				printf("bytes received:%d\n",bytesRcvd);
 				//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
+				fwrite(fileBuffer, sizeof(char), fileSize, fp);
+
 				totalBytesRcvd += bytesRcvd;
 			}
 			
 			printf("%s", fileBuffer);
-			fwrite(fileBuffer, sizeof(char), fileSize, fp);
+			//fwrite(fileBuffer, sizeof(char), fileSize, fp);
 			fclose(fp);
 			printf("file received successfully\n");
 
