@@ -31,8 +31,9 @@ void HandleTCPClient(int clntSocket){
 	char fileName[256];
 	char stringBuffer[RCVBUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
-	char msgType;
+	char msgType=0;
 	FILE *fp;
+
 
 	
 	while(msgType != 'e'){
@@ -41,11 +42,12 @@ void HandleTCPClient(int clntSocket){
 		memset(fileBuffer, 0, FILEBUFSIZE);
 		memset(stringBuffer, 0, RCVBUFSIZE);
 
+		
 		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0)
 		{
 			DieWithError("recv() failed");
 		}
-
+		
 		if(msgType == 'p'){
 			printf("Received msgtype from client:%c\n", msgType);
 	
