@@ -175,6 +175,47 @@ void HandleTCPClient(int clntSocket){
 			printf("bytes received:%d, received content:%s\n", bytesRcvd, stringBuffer);
 			printf("awaiting for operation\n");
 		}
+		else if(msgType == 'r'){
+			fp = popen("ls -l", "r");
+			if(fp == NULL){
+				DieWithError("popen failed");
+			}
+			/*
+			while( fgets(fileBuffer, FILEBUFSIZE,fp ) != NULL){
+				printf(" %s", fileBuffer);			
+			}
+			*/
+			printf("popened");
+			fread(fileBuffer, FILEBUFSIZE, 1, fp);
+			pclose(fp);
+
+			printf("%s", fileBuffer);
+
+			totalBytesSent = 0;
+			while(totalBytesSent < FILEBUFSIZE){
+				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+					DieWithError("send() sent a different number of bytes than expected");
+			
+				printf("sending list of files on server to client\n");
+				printf("bytes sent:%d\n", bytesSent);				
+				totalBytesSent += bytesSent;
+			}
+			printf("total bytes sent:%d\n", totalBytesSent);
+			
+			totalBytesRcvd = 0;
+			while(totalBytesRcvd < strlen("acknowledged")){
+				if(  (bytesRcvd = recv(clntSocket, stringBuffer, RCVBUFSIZE, 0)) < 0)
+					DieWithError("recv failed or connection closed prematurely");	
+				printf("why");
+				printf("total bytes received:%d, bytes received:%d\n", totalBytesRcvd, bytesRcvd);
+
+				totalBytesRcvd += bytesRcvd;
+				printf("total bytes received:%d", totalBytesRcvd);
+			}
+			
+			printf("total bytes received:%d, received string from client:%s\n", bytesRcvd, stringBuffer);
+			printf("awaiting operation\n");
+		}
 	}
 	printf("received:%c\n closing socket.\n", msgType);
 	close(clntSocket);

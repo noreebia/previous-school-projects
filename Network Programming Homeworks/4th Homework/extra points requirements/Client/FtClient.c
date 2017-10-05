@@ -10,7 +10,7 @@
 
 #define UPLOADFILEREQUEST 'p'
 #define DOWNLOADFILEREQUEST 'g'
-#define LISTFILESREQUEST 'l'
+#define LISTFILESREQUEST 'r'
 #define ACK 'a'
 
 void DieWithError(char *errorMessage);
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]){
 			totalBytesSent += bytesSent;
 			}
 
-			printf("%s (%d bytes) uploading succeeded to %s", fileName, totalBytesSent, servIP);
+			printf("%s (%d bytes) uploading succeeded to %s", fileName, fileSize, servIP);
 	
 			//receive acknowledgement
 			memset(echoBuffer, 0, RCVBUFSIZE);
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]){
 			fwrite(fileBuffer, sizeof(char), fileSize, fp);
 			fclose(fp);
 
-			printf("%s (%d bytes) downloading succeeded from %s\n", fileName, totalBytesRcvd, servIP);
+			printf("%s (%d bytes) downloading succeeded from %s\n", fileName, fileSize, servIP);
 
 			//send acknowledgement of successful file download
 			memset(echoBuffer, 0, RCVBUFSIZE);
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]){
 		}
 		
 		else if(operation == 'l'){
-			fp = popen("ls", "r");
+			fp = popen("ls -l", "r");
 			if(fp == NULL){
 				DieWithError("popen failed");
 			}
@@ -208,15 +208,41 @@ int main(int argc, char *argv[]){
 			}
 			pclose(fp);
 		}
-		
+		else if(operation == 'r'){
+			//send msgtype
+			msgType = LISTFILESREQUEST;
+			if(send(sock, &msgType, 1, 0) != 1)
+				DieWithError("send() sent a different number of bytes than expected");
+
+			printf("Sent msgtype: %c\n", msgType);
+
+			totalBytesRcvd = 0;
+			while(totalBytesRcvd < FILEBUFSIZE){
+				if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
+					DieWithError("recv failed or connection closed prematurely");	
+				
+				printf("received bytes:%d\n", bytesRcvd);
+				totalBytesRcvd += bytesRcvd;
+			}
+			
+			printf("total received bytes:%d, received contents:%s", totalBytesRcvd, fileBuffer);
+
+			strcpy(echoBuffer, "acknowledged");
+			totalBytesSent = 0;
+			while(totalBytesSent < strlen(echoBuffer)){
+				if((bytesSent = send(sock, echoBuffer, RCVBUFSIZE, 0)) != RCVBUFSIZE)
+					DieWithError("send() sent a different number of bytes than expected");
+			
+				printf("bytes sent:%d\n", bytesSent);				
+				totalBytesSent += bytesSent;
+			}
+			printf("Sent to server: %s\n", echoBuffer);
+		}
 	}
-	/*
-	if(send(sock, &msgType, 1, 0) != 1)
-		DieWithError("send() sent a different number of bytes than expected");
-	*/
 
 	if(send(sock, &operation, 1, 0) != 1)
 		DieWithError("send() sent a different number of bytes than expected");
+
 	printf("Sent msgtype: %c\n", operation);
 
 	printf("Exiting program.\n");
