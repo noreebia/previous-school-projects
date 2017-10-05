@@ -35,7 +35,7 @@ void HandleTCPClient(int clntSocket){
 	FILE *fp;
 
 	
-	while(1){
+	while(msgType != 'e'){
 		memset(fileSizeInString, 0, 20);
 		memset(fileName, 0, 256);
 		memset(fileBuffer, 0, FILEBUFSIZE);
@@ -174,6 +174,7 @@ void HandleTCPClient(int clntSocket){
 			printf("awaiting for operation\n");
 		}
 	}
+	printf("received:%c\n closing socket.\n", msgType);
 	close(clntSocket);
 }
 

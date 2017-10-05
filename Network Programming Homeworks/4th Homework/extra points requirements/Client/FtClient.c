@@ -196,8 +196,29 @@ int main(int argc, char *argv[]){
 			if(send(sock, echoBuffer, RCVBUFSIZE,0) != RCVBUFSIZE)
 				DieWithError("send() sent a different number of bytes than expected");
 		}
-
+		
+		else if(operation == 'l'){
+			fp = popen("ls", "r");
+			if(fp == NULL){
+				DieWithError("popen failed");
+			}
+			
+			while( fgets(fileBuffer, FILEBUFSIZE,fp ) != NULL){
+				printf(" %s", fileBuffer);
+			}
+			pclose(fp);
+		}
+		
 	}
+	/*
+	if(send(sock, &msgType, 1, 0) != 1)
+		DieWithError("send() sent a different number of bytes than expected");
+	*/
+
+	if(send(sock, &operation, 1, 0) != 1)
+		DieWithError("send() sent a different number of bytes than expected");
+	printf("Sent msgtype: %c\n", operation);
+
 	printf("Exiting program.\n");
 	close(sock);
 	exit(0);

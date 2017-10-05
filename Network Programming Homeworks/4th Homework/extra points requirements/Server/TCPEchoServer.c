@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
 		DieWithError("listen() failed");
 
 	while(1){
+		printf("listening for clients...\n");
+
 		clntLen = sizeof(echoClntAddr);
 	
 		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
