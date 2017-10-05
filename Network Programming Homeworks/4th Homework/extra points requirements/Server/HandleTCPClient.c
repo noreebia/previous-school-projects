@@ -33,8 +33,6 @@ void HandleTCPClient(int clntSocket){
 	char fileBuffer[FILEBUFSIZE];
 	char msgType=0;
 	FILE *fp;
-
-
 	
 	while(msgType != 'e'){
 		memset(fileSizeInString, 0, 20);
