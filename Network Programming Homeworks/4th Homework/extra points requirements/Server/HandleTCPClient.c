@@ -84,18 +84,6 @@ void HandleTCPClient(int clntSocket){
 			{
 				DieWithError("File open error");
 			}
-			/*
-			receivedFileSize = 0;
-			while(receivedFileSize < fileSize){
-				printf("receiving...\n");		
-				if((recvMsgSize = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
-					DieWithError("recv() failed");	
-				
-				printf("%d",recvMsgSize);
-				//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
-				receivedFileSize += recvMsgSize;
-			}
-			*/
 
 			//receive file contents
 			totalBytesRcvd = 0;
@@ -105,9 +93,7 @@ void HandleTCPClient(int clntSocket){
 					DieWithError("recv() failed");	
 				
 				printf("bytes received:%d\n",bytesRcvd);
-				//fwrite(fileBuffer, sizeof(char), FILEBUFSIZE, fp);
 				fwrite(fileBuffer, sizeof(char), fileSize, fp);
-
 				totalBytesRcvd += bytesRcvd;
 			}
 			
@@ -141,8 +127,10 @@ void HandleTCPClient(int clntSocket){
 			}
 
 			memset(fileBuffer, 0, FILEBUFSIZE);
+			/*
   		 	fread(fileBuffer, fileSize, 1, fp);
 			fclose(fp);
+			*/
 
 			//send size of file client wants to download
 			if(send(clntSocket, fileSizeInString, 20, 0) != 20)
@@ -157,6 +145,7 @@ void HandleTCPClient(int clntSocket){
 			printf("Received from client: %s\n", stringBuffer);
 
 			//sent contents of file to client
+			/*
 			totalBytesSent = 0;
 			while(totalBytesSent < fileSize){
 			if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
@@ -166,6 +155,17 @@ void HandleTCPClient(int clntSocket){
 			printf("bytes sent:%d\n", bytesSent);				
 			totalBytesSent += bytesSent;
 			}
+			*/
+			while( (fread(fileBuffer, 1, FILEBUFSIZE, fp)) > 0){
+				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+					DieWithError("send() sent a different number of bytes than expected");
+			
+				printf("Sending => ##########\n");
+				printf("bytes sent:%d\n", bytesSent);				
+				totalBytesSent += bytesSent;
+			}			
+			fclose(fp);
+
 
 			printf("sent file contents to client:%s\n", fileBuffer);
 
@@ -186,11 +186,7 @@ void HandleTCPClient(int clntSocket){
 			if(fp == NULL){
 				DieWithError("popen failed");
 			}
-			/*
-			while( fgets(fileBuffer, FILEBUFSIZE,fp ) != NULL){
-				printf(" %s", fileBuffer);			
-			}
-			*/
+
 			printf("popened");
 			fread(fileBuffer, FILEBUFSIZE, 1, fp);
 			pclose(fp);

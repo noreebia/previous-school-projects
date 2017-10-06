@@ -98,12 +98,15 @@ int main(int argc, char *argv[]){
 
 			memset(fileBuffer, 0, FILEBUFSIZE);
 
-			fp = fopen(fileName, "r");
+			fp = fopen(fileName, "rb");
 			if(fp == NULL){
 				DieWithError("No such file exists.");
 			}
+			/*
   		 	fread(fileBuffer, fileSize, 1, fp);
 			fclose(fp);
+			*/
+
 
 			//send msgtype
 			if(send(sock, &msgType, 1, 0) != 1)
@@ -136,7 +139,8 @@ int main(int argc, char *argv[]){
 			printf("Received from server: %s\n", stringBuffer);
 			printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
 	
-			//receive file contents
+			//send file contents
+			/*
 			totalBytesSent = 0;
 			while(totalBytesSent < fileSize){
 			if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
@@ -146,6 +150,18 @@ int main(int argc, char *argv[]){
 			printf("bytes sent:%d\n", bytesSent);				
 			totalBytesSent += bytesSent;
 			}
+			*/
+			while( fread(fileBuffer, 1, FILEBUFSIZE, fp) > 0){
+				printf("Sending => ##########\n");
+				if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+					DieWithError("send() sent a different number of bytes than expected");
+			
+				//printf("Sending => ##########\n");
+				printf("bytes sent:%d\n", bytesSent);				
+				totalBytesSent += bytesSent;
+			}
+			fclose(fp);
+			
 
 			printf("%s (%d bytes) uploading succeeded to %s", fileName, fileSize, servIP);
 	
@@ -207,12 +223,12 @@ int main(int argc, char *argv[]){
 			//receive file contents
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < fileSize){
-				if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
+				printf("receiving...\n");
+				if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) < 0)
 					DieWithError("recv failed or connection closed prematurely");	
-
+				printf("received bytes:%d\n", bytesRcvd);
 				fwrite(fileBuffer, sizeof(char), fileSize, fp);
 				printf("Receiving => ##########\n");
-				printf("received bytes:%d\n", bytesRcvd);
 				totalBytesRcvd += bytesRcvd;
 			}
 			
