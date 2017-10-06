@@ -28,6 +28,7 @@ int main(int argc, char *argv[]){
 	unsigned int echoStringLen;
 	int sock;
 	int fileSize;
+	int bytesToWrite;
 	int bytesRcvd, totalBytesRcvd;
 	int bytesSent, totalBytesSent;
 	char *echoString;
@@ -159,6 +160,7 @@ int main(int argc, char *argv[]){
 				//printf("Sending => ##########\n");
 				printf("bytes sent:%d\n", bytesSent);				
 				totalBytesSent += bytesSent;
+				memset(fileBuffer, 0, FILEBUFSIZE);
 			}
 			fclose(fp);
 			
@@ -224,12 +226,26 @@ int main(int argc, char *argv[]){
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < fileSize){
 				printf("receiving...\n");
+
+
+				if(fileSize - totalBytesRcvd < FILEBUFSIZE){
+					bytesToWrite = fileSize - totalBytesRcvd;
+				}
+				else{
+					bytesToWrite = FILEBUFSIZE;
+				}
+
 				if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) < 0)
 					DieWithError("recv failed or connection closed prematurely");	
 				printf("received bytes:%d\n", bytesRcvd);
-				fwrite(fileBuffer, sizeof(char), fileSize, fp);
+
+				fwrite(fileBuffer, sizeof(char), bytesToWrite, fp);
+
+				totalBytesRcvd += bytesRcvd; 
+
 				printf("Receiving => ##########\n");
-				totalBytesRcvd += bytesRcvd;
+				//totalBytesRcvd += bytesRcvd;
+				memset(fileBuffer, 0, FILEBUFSIZE);
 			}
 			
 			//open file and write

@@ -11,6 +11,7 @@ int fSize(char* file);
 
 void HandleTCPClient(int clntSocket){
 	int fileSize;
+	int bytesToWrite;
 	int totalBytesSent, bytesSent;
 	int bytesRcvd, totalBytesRcvd;
 	char fileSizeInString[20];
@@ -88,13 +89,22 @@ void HandleTCPClient(int clntSocket){
 			//receive file contents
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < fileSize){
+
+				if(fileSize - totalBytesRcvd < FILEBUFSIZE){
+					bytesToWrite = fileSize - totalBytesRcvd;
+				}
+				else{
+					bytesToWrite = FILEBUFSIZE;
+				}
+
 				printf("receiving...\n");		
 				if((bytesRcvd = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
 					DieWithError("recv() failed");	
 				
 				printf("bytes received:%d\n",bytesRcvd);
-				fwrite(fileBuffer, sizeof(char), fileSize, fp);
+				fwrite(fileBuffer, sizeof(char), bytesToWrite, fp);
 				totalBytesRcvd += bytesRcvd;
+				memset(fileBuffer, 0, FILEBUFSIZE);
 			}
 			
 			printf("%s", fileBuffer);
@@ -157,12 +167,14 @@ void HandleTCPClient(int clntSocket){
 			}
 			*/
 			while( (fread(fileBuffer, 1, FILEBUFSIZE, fp)) > 0){
+
 				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
 			
 				printf("Sending => ##########\n");
 				printf("bytes sent:%d\n", bytesSent);				
 				totalBytesSent += bytesSent;
+				memset(fileBuffer, 0, FILEBUFSIZE);
 			}			
 			fclose(fp);
 
