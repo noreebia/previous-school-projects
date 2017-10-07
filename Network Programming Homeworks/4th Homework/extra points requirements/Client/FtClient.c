@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
 	char fileBuffer[FILEBUFSIZE];
 	char fileName[256];
 	char fileSizeInString[20];
+	char command[20];
 	char operation;
 	char msgType;
 	int mode=1;
@@ -73,11 +74,11 @@ int main(int argc, char *argv[]){
 		DieWithError("recv() failed");
 	}
 
-	printf("Msg< %s\n", stringBuffer);	
+	printf("Msg< %s\n\n", stringBuffer);	
 
 	while(1){
 		if(mode == 1){
-			printf("\nMsg> ");
+			printf("Msg> ");
 			/* Read string through input */
 			scanf(" %s", stringBuffer);
 
@@ -99,33 +100,33 @@ int main(int argc, char *argv[]){
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 
-				printf("sent msgType: %c\n", msgType);
+				//printf("sent msgType: %c\n", msgType);
 				/* Send inputted string to server */
 				if( send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE){	
 					DieWithError("recv() failed or connection closed prematurely");
 				}
 
-				printf("sent stringbuffer:%s", stringBuffer);
+				//printf("sent stringbuffer:%s", stringBuffer);
 		
 				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
 					DieWithError("recv() failed");
 				}
 
 				stringLength = strlen(stringBuffer);
-				printf("received msgType:%c\n", msgType);
+				//printf("received msgType:%c\n", msgType);
 
 				/* Receive echoed string from server */
 				memset(stringBuffer, 0, STRINGBUFSIZE);
-								printf("length of string:%d\n", stringLength);
+				//printf("length of string:%d\n", stringLength);
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < stringLength){
-					printf("length of string:%d\n", stringLength);
+					//printf("length of string:%d\n", stringLength);
    	 	   		 	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE , 0)) <= 0){
 						DieWithError("recv failed or connection closed prematurely");
 					}			
    		    	 	totalBytesRcvd += bytesRcvd;
 					//echoBuffer[bytesRcvd] = '\0';
-	       			printf("Msg< %s\n", stringBuffer);
+	       			printf("Msg< %s\n\n", stringBuffer);
 				}
 			}
 		}
@@ -135,9 +136,16 @@ int main(int argc, char *argv[]){
 			memset(fileName, 0, 256);
 			memset(fileSizeInString, 0, 20);	
 			memset(fileBuffer, 0, FILEBUFSIZE);	
+			memset(command, 0, 20);
 
 			printf("ftp command [p)ut g)et l)s r)ls e)xit ] -> ");
-			scanf(" %c", &operation);
+			//scanf(" %c", operation);
+			scanf(" %s", command);
+			if(strlen(command) != 1){
+				printf("Unrecognizable command. Please try again.\n");
+				continue;
+			}
+			operation = command[0];
 
 			if(operation == 'p'){
 				msgType = UPLOADFILEREQUEST;
@@ -348,7 +356,9 @@ int main(int argc, char *argv[]){
 
 			else if(operation == 'e'){
 				mode = 1;
-				printf("switching to echo chat mode\n");
+			}
+			else{
+				printf("Unrecognizable command. Please try again.\n");
 			}
 		}
 	}

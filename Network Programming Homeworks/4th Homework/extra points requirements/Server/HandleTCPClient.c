@@ -42,7 +42,7 @@ void HandleTCPClient(int clntSocket){
 	if(send(clntSocket, stringBuffer, BUFSIZE, 0) != BUFSIZE)
 		DieWithError("send() sent a different number of bytes than expected");
 	
-	printf("Msg> %s\n", stringBuffer);
+	printf("Msg> %s\n\n", stringBuffer);
 
 	while(msgType != EXIT){
 		memset(fileSizeInString, 0, 20);
@@ -53,7 +53,7 @@ void HandleTCPClient(int clntSocket){
 		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0){
 			DieWithError("recv() failed");
 		}
-		printf("received msgType:%c\n", msgType);
+		//printf("received msgType:%c\n", msgType);
 
 		if(msgType == ECHO){
 			totalBytesRcvd = 0;
@@ -65,6 +65,7 @@ void HandleTCPClient(int clntSocket){
 			}
 			printf("Msg<%s\n", stringBuffer);
 
+			/*
 			if(strcmp(stringBuffer, "FT") != 0){
 				msgType = ECHO;
 				if(send(clntSocket, &msgType, 1, 0) != 1)
@@ -73,7 +74,7 @@ void HandleTCPClient(int clntSocket){
 				if( send(clntSocket, stringBuffer, BUFSIZE,0) != BUFSIZE){
 					DieWithError("send() failed");
 				}
-				printf("Msg>%s\n", stringBuffer);
+				printf("Msg>%s\n\n", stringBuffer);
 			}
 			else{
 				msgType = ACK;
@@ -81,6 +82,15 @@ void HandleTCPClient(int clntSocket){
 				if(send(clntSocket, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 			}
+			*/
+			msgType = ECHO;
+			if(send(clntSocket, &msgType, 1, 0) != 1)
+				DieWithError("send() sent a different number of bytes than expected");
+
+			if( send(clntSocket, stringBuffer, BUFSIZE,0) != BUFSIZE){
+				DieWithError("send() failed");
+			}
+			printf("Msg>%s\n\n", stringBuffer);
 		}
 		
 		else if(msgType == UPLOADFILEREQUEST){
