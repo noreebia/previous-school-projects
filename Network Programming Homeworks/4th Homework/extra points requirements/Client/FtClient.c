@@ -5,13 +5,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#define RCVBUFSIZE 32
+#define STRINGBUFSIZE 32
 #define FILEBUFSIZE 1024
 
 #define UPLOADFILEREQUEST 'p'
 #define DOWNLOADFILEREQUEST 'g'
 #define LISTFILESREQUEST 'r'
 #define ACK 'a'
+#define ECHO 'c'
 
 void DieWithError(char *errorMessage);
 int fSize(char* file);
@@ -32,12 +33,14 @@ int main(int argc, char *argv[]){
 	int bytesRcvd, totalBytesRcvd;
 	int bytesSent, totalBytesSent;
 	char *echoString;
-	char stringBuffer[RCVBUFSIZE];
+	char stringBuffer[STRINGBUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
 	char fileName[256];
 	char fileSizeInString[20];
 	char operation;
 	char msgType;
+	int mode=1;
+	int stringLength;
 	FILE *fp;
 
 	printf("server ip : ");
@@ -58,248 +61,308 @@ int main(int argc, char *argv[]){
 		DieWithError("connect() failed");
 
 	strcpy(stringBuffer, "hello");
-	if(send(sock, stringBuffer, RCVBUFSIZE, 0) != RCVBUFSIZE)
+	if(send(sock, stringBuffer, STRINGBUFSIZE, 0) != STRINGBUFSIZE)
 		DieWithError("send() sent a different number of bytes than expected");
 
 	printf("Msg> %s\n", stringBuffer);	
 
-	memset(stringBuffer, 0, RCVBUFSIZE);
-	if((bytesRcvd = recv(sock, stringBuffer, RCVBUFSIZE, 0)) <0){
+	memset(stringBuffer, 0, STRINGBUFSIZE);
+	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE, 0)) <0){
 		DieWithError("recv() failed");
 	}
 
 	printf("Msg< %s\n", stringBuffer);	
 
-	memset(stringBuffer, 0, RCVBUFSIZE);
+	/*
+	memset(stringBuffer, 0, STRINGBUFSIZE);
 	strcpy(stringBuffer, "FT");
-	if(send(sock, stringBuffer, RCVBUFSIZE, 0) != RCVBUFSIZE)
+	if(send(sock, stringBuffer, STRINGBUFSIZE, 0) != STRINGBUFSIZE)
 		DieWithError("send() sent a different number of bytes than expected");
 
 	printf("Msg> %s\n", stringBuffer);	
-
-	printf("Welcome to Socket FT client!\n");
-
+	*/
 	while(operation != 'e'){
-		memset(stringBuffer, 0, RCVBUFSIZE);
-		memset(fileName, 0, 256);
-		memset(fileSizeInString, 0, 20);	
-		memset(fileBuffer, 0, FILEBUFSIZE);	
-
-		printf("ftp command [p)ut g)et l)s r)ls e)xit ] -> ");
-		scanf(" %c", &operation);
-
-		if(operation == 'p'){
-			msgType = UPLOADFILEREQUEST;
-
-			printf("Name of file to put on server:");
-			scanf("%s", fileName);
+		if(mode == 1){
+			printf("\nMsg> ");
+			/* Read string through input */
+			scanf(" %s", stringBuffer);
 	
-			fileSize = fSize(fileName);
-			sprintf(fileSizeInString, "%d", fileSize);
-
-			memset(fileBuffer, 0, FILEBUFSIZE);
-
-			fp = fopen(fileName, "rb");
-			if(fp == NULL){
-				DieWithError("No such file exists.");
-			}
-			/*
-  		 	fread(fileBuffer, fileSize, 1, fp);
-			fclose(fp);
-			*/
-
-
 			//send msgtype
+			msgType = ECHO;
 			if(send(sock, &msgType, 1, 0) != 1)
 				DieWithError("send() sent a different number of bytes than expected");
 
-			printf("Sent msgtype: %c\n", msgType);
-				
-			//send file name to upload
-			if(send(sock, fileName, 256, 0) != 256)
-				DieWithError("send() sent a different number of bytes than expected");
+			printf("sent msgType: %c\n", msgType);
 
-			printf("Sent filename to server: %s\n", fileName);
+			if(strcmp(stringBuffer, "FT") != 0){
 
-			//send file size
-			if(send(sock, fileSizeInString, 20, 0) != 20)
-				DieWithError("send() sent a different number of bytes than expected");
+				/* Send inputted string to server */
+				if( send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE){	
+					DieWithError("recv() failed or connection closed prematurely");
+				}
 
-			printf("Sent file size to server: %s\n", fileSizeInString);
-
-			//receive acknowledgement
-			memset(stringBuffer, 0, RCVBUFSIZE);
-			totalBytesRcvd = 0;
-			while(totalBytesRcvd < strlen("acknowledged")){
-				if((bytesRcvd = recv(sock, stringBuffer, RCVBUFSIZE, 0)) <= 0)
-					DieWithError("recv failed or connection closed prematurely");	
-
-				totalBytesRcvd += bytesRcvd;
-			}
+				printf("sent stringbuffer:%s", stringBuffer);
 		
-			printf("Received from server: %s\n", stringBuffer);
-			printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
-	
-			//send file contents
-			/*
-			totalBytesSent = 0;
-			while(totalBytesSent < fileSize){
-			if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
-				DieWithError("send() sent a different number of bytes than expected");
-			
-			printf("Sending => ##########\n");
-			printf("bytes sent:%d\n", bytesSent);				
-			totalBytesSent += bytesSent;
+				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
+					DieWithError("recv() failed");
+				}
+
+				stringLength = strlen(stringBuffer);
+				printf("received msgType:%c\n", msgType);
+
+				/* Receive echoed string from server */
+				memset(stringBuffer, 0, STRINGBUFSIZE);
+								printf("length of string:%d\n", stringLength);
+				totalBytesRcvd = 0;
+				while(totalBytesRcvd < stringLength){
+					printf("length of string:%d\n", stringLength);
+   	 	   		 	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE , 0)) <= 0){
+						DieWithError("recv failed or connection closed prematurely");
+					}			
+   		    	 	totalBytesRcvd += bytesRcvd;
+					//echoBuffer[bytesRcvd] = '\0';
+	       			printf("Msg<- %s\n", stringBuffer);
+				}
 			}
-			*/
-			while( fread(fileBuffer, 1, FILEBUFSIZE, fp) > 0){
-				printf("Sending => ##########\n");
+			else{
+				/* Send inputted string to server */
+				if( send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE){	
+					DieWithError("recv() failed or connection closed prematurely");
+				}
+	
+				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
+					DieWithError("recv() failed");
+				}
+				mode = 2;
+				printf("Welcome to Socket FT client!\n");
+			}
+		}
+
+		else if(mode == 2){
+			memset(stringBuffer, 0, STRINGBUFSIZE);
+			memset(fileName, 0, 256);
+			memset(fileSizeInString, 0, 20);	
+			memset(fileBuffer, 0, FILEBUFSIZE);	
+
+			printf("ftp command [p)ut g)et l)s r)ls e)xit ] -> ");
+			scanf(" %c", &operation);
+
+			if(operation == 'p'){
+				msgType = UPLOADFILEREQUEST;
+
+				printf("Name of file to put on server:");
+				scanf("%s", fileName);
+	
+				fileSize = fSize(fileName);
+				sprintf(fileSizeInString, "%d", fileSize);
+
+				memset(fileBuffer, 0, FILEBUFSIZE);
+
+				fp = fopen(fileName, "rb");
+				if(fp == NULL){
+					DieWithError("No such file exists.");
+				}
+				/*
+  			 	fread(fileBuffer, fileSize, 1, fp);
+				fclose(fp);
+				*/
+
+
+				//send msgtype
+				if(send(sock, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
+	
+				printf("Sent msgtype: %c\n", msgType);	
+				
+				//send file name to upload
+				if(send(sock, fileName, 256, 0) != 256)
+					DieWithError("send() sent a different number of bytes than expected");
+
+				printf("Sent filename to server: %s\n", fileName);
+
+				//send file size
+				if(send(sock, fileSizeInString, 20, 0) != 20)
+					DieWithError("send() sent a different number of bytes than expected");
+
+				printf("Sent file size to server: %s\n", fileSizeInString);
+
+				//receive acknowledgement
+				memset(stringBuffer, 0, STRINGBUFSIZE);
+				totalBytesRcvd = 0;
+				while(totalBytesRcvd < strlen("acknowledged")){
+					if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE, 0)) <= 0)
+						DieWithError("recv failed or connection closed prematurely");	
+
+					totalBytesRcvd += bytesRcvd;
+				}
+		
+				printf("Received from server: %s\n", stringBuffer);
+				printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
+	
+				//send file contents
+				/*
+				totalBytesSent = 0;
+				while(totalBytesSent < fileSize){
 				if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
-			
-				//printf("Sending => ##########\n");
+				
+				printf("Sending => ##########\n");
 				printf("bytes sent:%d\n", bytesSent);				
 				totalBytesSent += bytesSent;
-				memset(fileBuffer, 0, FILEBUFSIZE);
-			}
-			fclose(fp);
+				}
+				*/
+				while( fread(fileBuffer, 1, FILEBUFSIZE, fp) > 0){
+					printf("Sending => ##########\n");
+					if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+						DieWithError("send() sent a different number of bytes than expected");
+			
+					//printf("Sending => ##########\n");
+					printf("bytes sent:%d\n", bytesSent);				
+					totalBytesSent += bytesSent;
+					memset(fileBuffer, 0, FILEBUFSIZE);
+				}
+				fclose(fp);
 			
 
-			printf("%s (%d bytes) uploading succeeded to %s", fileName, fileSize, servIP);
+				printf("%s (%d bytes) uploading succeeded to %s", fileName, fileSize, servIP);
 	
-			//receive acknowledgement
-			memset(stringBuffer, 0, RCVBUFSIZE);
-			totalBytesRcvd = 0;
-			while(totalBytesRcvd < strlen("acknowledged")){
-				if((bytesRcvd = recv(sock, stringBuffer, RCVBUFSIZE - 1, 0)) <= 0)
-					DieWithError("recv failed or connection closed prematurely");	
-
-				totalBytesRcvd += bytesRcvd;
-			}
-			printf("bytes received:%d, received content:%s\n",bytesRcvd, stringBuffer);
-		}
-		else if(operation == 'g'){
-			msgType = DOWNLOADFILEREQUEST;
-
-			printf("Name of file to get from server:");
-			scanf("%s", fileName);
-
-			if(send(sock, &msgType, 1, 0) != 1)
-				DieWithError("send() sent a different number of bytes than expected");
-
-			printf("Sent message type: %c\n", msgType);
-				
-			//send name of file to download;
-			if(send(sock, fileName, 256, 0) != 256)
-				DieWithError("send() sent a different number of bytes than expected");
-
-			printf("Sent name of file that I want to download to server: %s\n", fileName);
-
-			//receive size of file;
-			memset(fileSizeInString, 0, 20);
-			totalBytesRcvd = 0;
-			while(totalBytesRcvd < 20){
-				if((bytesRcvd = recv(sock, fileSizeInString, 20, 0)) <= 0)
-					DieWithError("recv failed or connection closed prematurely");	
-
-				totalBytesRcvd += bytesRcvd;
-			}
-			
-			printf("bytes received:%d", bytesRcvd);
-			printf("Received file size from server: %s", fileSizeInString);
-			fileSize = atoi(fileSizeInString);
-			printf("Length of file that server will send:%d\n", fileSize);
-
-			fp = fopen(fileName, "w");
-			if(fp == NULL){
-				DieWithError("fopen failed.");
-			}
-
-			//send acknowledgement
-			strcpy(stringBuffer, "acknowledged");
-			if(send(sock, stringBuffer, RCVBUFSIZE,0) != RCVBUFSIZE)
-				DieWithError("send() sent a different number of bytes than expected");
-
-			printf("Sent to server: %s\n", stringBuffer);
-
-			//receive file contents
-			totalBytesRcvd = 0;
-			while(totalBytesRcvd < fileSize){
-				printf("receiving...\n");
-
-
-				if(fileSize - totalBytesRcvd < FILEBUFSIZE){
-					bytesToWrite = fileSize - totalBytesRcvd;
+				//receive acknowledgement
+				memset(stringBuffer, 0, STRINGBUFSIZE);
+				totalBytesRcvd = 0;
+				while(totalBytesRcvd < strlen("acknowledged")){
+					if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE - 1, 0)) <= 0)
+						DieWithError("recv failed or connection closed prematurely");	
+	
+					totalBytesRcvd += bytesRcvd;
 				}
-				else{
-					bytesToWrite = FILEBUFSIZE;
-				}
-
-				if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) < 0)
-					DieWithError("recv failed or connection closed prematurely");	
-				printf("received bytes:%d\n", bytesRcvd);
-
-				fwrite(fileBuffer, sizeof(char), bytesToWrite, fp);
-
-				totalBytesRcvd += bytesRcvd; 
-
-				printf("Receiving => ##########\n");
-				//totalBytesRcvd += bytesRcvd;
-				memset(fileBuffer, 0, FILEBUFSIZE);
+				printf("bytes received:%d, received content:%s\n",bytesRcvd, stringBuffer);
 			}
-			
-			//open file and write
-			fclose(fp);
+			else if(operation == 'g'){
+				msgType = DOWNLOADFILEREQUEST;
 
-			printf("%s (%d bytes) downloading succeeded from %s\n", fileName, fileSize, servIP);
+				printf("Name of file to get from server:");
+				scanf("%s", fileName);
 
-			//send acknowledgement of successful file download
-			memset(stringBuffer, 0, RCVBUFSIZE);
-			strcpy(stringBuffer, "acknowledged");
-			if(send(sock, stringBuffer, RCVBUFSIZE,0) != RCVBUFSIZE)
-				DieWithError("send() sent a different number of bytes than expected");
-		}
-		
-		else if(operation == 'l'){
-			fp = popen("ls -l", "r");
-			if(fp == NULL){
-				DieWithError("popen failed");
-			}
-			
-			while( fgets(fileBuffer, FILEBUFSIZE,fp ) != NULL){
-				printf(" %s", fileBuffer);
-			}
-			pclose(fp);
-		}
-		else if(operation == 'r'){
-			//send msgtype
-			msgType = LISTFILESREQUEST;
-			if(send(sock, &msgType, 1, 0) != 1)
-				DieWithError("send() sent a different number of bytes than expected");
-
-			printf("Sent msgtype: %c\n", msgType);
-
-			totalBytesRcvd = 0;
-			while(totalBytesRcvd < FILEBUFSIZE){
-				if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
-					DieWithError("recv failed or connection closed prematurely");	
-				
-				printf("received bytes:%d\n", bytesRcvd);
-				totalBytesRcvd += bytesRcvd;
-			}
-			
-			printf("total received bytes:%d, received contents:%s", totalBytesRcvd, fileBuffer);
-
-			strcpy(stringBuffer, "acknowledged");
-			totalBytesSent = 0;
-			while(totalBytesSent < strlen(stringBuffer)){
-				if((bytesSent = send(sock, stringBuffer, RCVBUFSIZE, 0)) != RCVBUFSIZE)
+				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
+
+				printf("Sent message type: %c\n", msgType);
+				
+				//send name of file to download;
+				if(send(sock, fileName, 256, 0) != 256)
+					DieWithError("send() sent a different number of bytes than expected");
+
+				printf("Sent name of file that I want to download to server: %s\n", fileName);
+
+				//receive size of file;
+				memset(fileSizeInString, 0, 20);
+				totalBytesRcvd = 0;
+				while(totalBytesRcvd < 20){
+					if((bytesRcvd = recv(sock, fileSizeInString, 20, 0)) <= 0)
+						DieWithError("recv failed or connection closed prematurely");	
+
+					totalBytesRcvd += bytesRcvd;
+				}
 			
-				printf("bytes sent:%d\n", bytesSent);				
-				totalBytesSent += bytesSent;
+				printf("bytes received:%d", bytesRcvd);
+				printf("Received file size from server: %s", fileSizeInString);
+				fileSize = atoi(fileSizeInString);
+				printf("Length of file that server will send:%d\n", fileSize);
+
+				fp = fopen(fileName, "w");
+				if(fp == NULL){
+					DieWithError("fopen failed.");
+				}
+
+				//send acknowledgement
+				strcpy(stringBuffer, "acknowledged");
+				if(send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE)
+					DieWithError("send() sent a different number of bytes than expected");
+
+				printf("Sent to server: %s\n", stringBuffer);
+
+				//receive file contents
+				totalBytesRcvd = 0;
+				while(totalBytesRcvd < fileSize){
+					printf("receiving...\n");
+
+
+					if(fileSize - totalBytesRcvd < FILEBUFSIZE){
+						bytesToWrite = fileSize - totalBytesRcvd;
+					}
+					else{
+						bytesToWrite = FILEBUFSIZE;
+					}
+
+					if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) < 0)
+						DieWithError("recv failed or connection closed prematurely");	
+					printf("received bytes:%d\n", bytesRcvd);
+
+					fwrite(fileBuffer, sizeof(char), bytesToWrite, fp);
+
+					totalBytesRcvd += bytesRcvd; 
+
+					printf("Receiving => ##########\n");
+					//totalBytesRcvd += bytesRcvd;
+					memset(fileBuffer, 0, FILEBUFSIZE);
+				}
+			
+				//open file and write
+				fclose(fp);
+
+				printf("%s (%d bytes) downloading succeeded from %s\n", fileName, fileSize, servIP);
+
+				//send acknowledgement of successful file download
+				memset(stringBuffer, 0, STRINGBUFSIZE);
+				strcpy(stringBuffer, "acknowledged");
+				if(send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE)
+					DieWithError("send() sent a different number of bytes than expected");
 			}
-			printf("Sent to server: %s\n", stringBuffer);
+		
+			else if(operation == 'l'){
+				fp = popen("ls -l", "r");
+				if(fp == NULL){
+					DieWithError("popen failed");
+				}
+			
+				while( fgets(fileBuffer, FILEBUFSIZE,fp ) != NULL){
+					printf(" %s", fileBuffer);
+				}
+				pclose(fp);
+			}
+			else if(operation == 'r'){
+				//send msgtype
+				msgType = LISTFILESREQUEST;
+				if(send(sock, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
+	
+				printf("Sent msgtype: %c\n", msgType);
+	
+				totalBytesRcvd = 0;
+				while(totalBytesRcvd < FILEBUFSIZE){
+					if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
+						DieWithError("recv failed or connection closed prematurely");	
+					
+					printf("received bytes:%d\n", bytesRcvd);
+					totalBytesRcvd += bytesRcvd;
+				}
+			
+				printf("total received bytes:%d, received contents:%s", totalBytesRcvd, fileBuffer);
+
+				strcpy(stringBuffer, "acknowledged");
+				totalBytesSent = 0;
+				while(totalBytesSent < strlen(stringBuffer)){
+					if((bytesSent = send(sock, stringBuffer, STRINGBUFSIZE, 0)) != STRINGBUFSIZE)
+						DieWithError("send() sent a different number of bytes than expected");
+			
+					printf("bytes sent:%d\n", bytesSent);				
+					totalBytesSent += bytesSent;
+				}
+				printf("Sent to server: %s\n", stringBuffer);
+			}
+		}
+		else if(operation == 'e'){
+			mode = 1;
 		}
 	}
 
