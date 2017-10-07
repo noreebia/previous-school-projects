@@ -11,6 +11,7 @@
 #define UPLOADFILEREQUEST 'p'
 #define DOWNLOADFILEREQUEST 'g'
 #define LISTFILESREQUEST 'r'
+#define ERROR 'x'
 #define ACK 'a'
 #define ECHO 'c'
 #define EXIT 'q'
@@ -228,6 +229,15 @@ int main(int argc, char *argv[]){
 					DieWithError("send() sent a different number of bytes than expected");
 
 				printf("Sent name of file that I want to download to server: %s\n", fileName);
+
+				//receive name of file clients wants to upload
+				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0)
+					DieWithError("recv() failed");	
+
+				if(msgType == ERROR){
+					printf("File with that name does not exist on server. Please try again.\n");
+					continue;
+				}
 
 				//receive size of file;
 				memset(fileSizeInString, 0, 20);

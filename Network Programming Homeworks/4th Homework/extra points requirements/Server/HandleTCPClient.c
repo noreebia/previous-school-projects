@@ -8,9 +8,11 @@
 #define UPLOADFILEREQUEST 'p'
 #define DOWNLOADFILEREQUEST 'g'
 #define LISTFILESREQUEST 'r'
+#define ERROR 'x'
 #define ACK 'a'
 #define ECHO 'c'
 #define EXIT 'q'
+#define READY 'y'
 
 void DieWithError(char *errorMessage);
 
@@ -155,13 +157,21 @@ void HandleTCPClient(int clntSocket){
 			fileSize = fSize(fileName);		
 			sprintf(fileSizeInString, "%d", fileSize);	
 
-			//open file
+			//open file. if file does not exist, send error message to client.
 			fp = fopen(fileName, "r");
 			if(fp == NULL){
-				DieWithError("No such file exists.");
+				//DieWithError("No such file exists.");
+				msgType = ERROR;
+				if(send(clntSocket, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
+				continue;
+			}
+			else{
+				msgType = READY;
+				if(send(clntSocket, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
 			}
 
-			memset(fileBuffer, 0, FILEBUFSIZE);
 
 			//send size of file client wants to download
 			if(send(clntSocket, fileSizeInString, 20, 0) != 20)
