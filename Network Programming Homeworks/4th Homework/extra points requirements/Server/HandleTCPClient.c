@@ -51,7 +51,7 @@ void HandleTCPClient(int clntSocket){
 		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0){
 			DieWithError("recv() failed");
 		}
-		printf("received msgType:%c", msgType);
+		printf("received msgType:%c\n", msgType);
 
 		if(msgType == ECHO){
 			totalBytesRcvd = 0;
@@ -61,6 +61,7 @@ void HandleTCPClient(int clntSocket){
 
 				totalBytesRcvd += bytesRcvd;
 			}
+			printf("Msg<%s\n", stringBuffer);
 
 			if(strcmp(stringBuffer, "FT") != 0){
 				msgType = ECHO;
@@ -70,8 +71,8 @@ void HandleTCPClient(int clntSocket){
 				if( send(clntSocket, stringBuffer, BUFSIZE,0) != BUFSIZE){
 					DieWithError("send() failed");
 				}
+				printf("Msg>%s\n", stringBuffer);
 			}
-
 			else{
 				msgType = ACK;
 
@@ -82,7 +83,6 @@ void HandleTCPClient(int clntSocket){
 		
 		else if(msgType == UPLOADFILEREQUEST){
 			printf("Received msgtype from client:%c\n", msgType);
-	
 
 			//receive name of file clients wants to upload
 			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
@@ -107,6 +107,7 @@ void HandleTCPClient(int clntSocket){
 
 			printf("sent to client:%s\n", stringBuffer);
 
+			//open file
 			fp = fopen(fileName, "wb");
 			if(fp == NULL)
 			{
@@ -116,14 +117,12 @@ void HandleTCPClient(int clntSocket){
 			//receive file contents
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < fileSize){
-
 				if(fileSize - totalBytesRcvd < FILEBUFSIZE){
 					bytesToWrite = fileSize - totalBytesRcvd;
 				}
 				else{
 					bytesToWrite = FILEBUFSIZE;
 				}
-
 				printf("receiving...\n");		
 				if((bytesRcvd = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
 					DieWithError("recv() failed");	
@@ -133,9 +132,7 @@ void HandleTCPClient(int clntSocket){
 				totalBytesRcvd += bytesRcvd;
 				memset(fileBuffer, 0, FILEBUFSIZE);
 			}
-			
 			printf("%s", fileBuffer);
-			//fwrite(fileBuffer, sizeof(char), fileSize, fp);
 			fclose(fp);
 			printf("file received successfully\n");
 
@@ -158,16 +155,13 @@ void HandleTCPClient(int clntSocket){
 			fileSize = fSize(fileName);		
 			sprintf(fileSizeInString, "%d", fileSize);	
 
+			//open file
 			fp = fopen(fileName, "r");
 			if(fp == NULL){
 				DieWithError("No such file exists.");
 			}
 
 			memset(fileBuffer, 0, FILEBUFSIZE);
-			/*
-  		 	fread(fileBuffer, fileSize, 1, fp);
-			fclose(fp);
-			*/
 
 			//send size of file client wants to download
 			if(send(clntSocket, fileSizeInString, 20, 0) != 20)
@@ -182,19 +176,7 @@ void HandleTCPClient(int clntSocket){
 			printf("Received from client: %s\n", stringBuffer);
 
 			//sent contents of file to client
-			/*
-			totalBytesSent = 0;
-			while(totalBytesSent < fileSize){
-			if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
-				DieWithError("send() sent a different number of bytes than expected");
-			
-			printf("Sending => ##########\n");
-			printf("bytes sent:%d\n", bytesSent);				
-			totalBytesSent += bytesSent;
-			}
-			*/
 			while( (fread(fileBuffer, 1, FILEBUFSIZE, fp)) > 0){
-
 				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
 			
@@ -204,7 +186,6 @@ void HandleTCPClient(int clntSocket){
 				memset(fileBuffer, 0, FILEBUFSIZE);
 			}			
 			fclose(fp);
-
 
 			printf("sent file contents to client:%s\n", fileBuffer);
 

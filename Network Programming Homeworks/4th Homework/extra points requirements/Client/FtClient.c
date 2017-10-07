@@ -79,10 +79,7 @@ int main(int argc, char *argv[]){
 			printf("\nMsg> ");
 			/* Read string through input */
 			scanf(" %s", stringBuffer);
-	
-			//send msgtype
-			/*
-			*/
+
 			if(strcmp(stringBuffer, "/quit") == 0){
 				msgType = EXIT;
 				if(send(sock, &msgType, 1, 0) != 1)
@@ -92,7 +89,6 @@ int main(int argc, char *argv[]){
 			}
 			
 			else if(strcmp(stringBuffer, "FT") == 0){
-
 				mode = 2;
 				printf("Welcome to Socket FT client!\n");
 			}
@@ -128,7 +124,7 @@ int main(int argc, char *argv[]){
 					}			
    		    	 	totalBytesRcvd += bytesRcvd;
 					//echoBuffer[bytesRcvd] = '\0';
-	       			printf("Msg<- %s\n", stringBuffer);
+	       			printf("Msg< %s\n", stringBuffer);
 				}
 			}
 		}
@@ -151,17 +147,12 @@ int main(int argc, char *argv[]){
 				fileSize = fSize(fileName);
 				sprintf(fileSizeInString, "%d", fileSize);
 
-				memset(fileBuffer, 0, FILEBUFSIZE);
-
 				fp = fopen(fileName, "rb");
 				if(fp == NULL){
-					DieWithError("No such file exists.");
+					//DieWithError("No such file exists.");
+					printf("No such file exists. Try again.\n");
+					continue;
 				}
-				/*
-  			 	fread(fileBuffer, fileSize, 1, fp);
-				fclose(fp);
-				*/
-
 
 				//send msgtype
 				if(send(sock, &msgType, 1, 0) != 1)
@@ -195,17 +186,6 @@ int main(int argc, char *argv[]){
 				printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
 	
 				//send file contents
-				/*
-				totalBytesSent = 0;
-				while(totalBytesSent < fileSize){
-				if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
-					DieWithError("send() sent a different number of bytes than expected");
-				
-				printf("Sending => ##########\n");
-				printf("bytes sent:%d\n", bytesSent);				
-				totalBytesSent += bytesSent;
-				}
-				*/
 				while( fread(fileBuffer, 1, FILEBUFSIZE, fp) > 0){
 					printf("Sending => ##########\n");
 					if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
@@ -355,17 +335,13 @@ int main(int argc, char *argv[]){
 				}
 				printf("Sent to server: %s\n", stringBuffer);
 			}
+
 			else if(operation == 'e'){
 				mode = 1;
 				printf("switching to echo chat mode\n");
 			}
 		}
 	}
-	/*
-	msgType = EXIT;
-	if(send(sock, &msgType, 1, 0) != 1)
-		DieWithError("send() sent a different number of bytes than expected");
-	*/
 	printf("Sent msgtype: %c\n", msgType);
 
 	printf("Exiting program.\n");
