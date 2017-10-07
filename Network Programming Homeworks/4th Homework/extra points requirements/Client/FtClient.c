@@ -13,6 +13,7 @@
 #define LISTFILESREQUEST 'r'
 #define ACK 'a'
 #define ECHO 'c'
+#define EXIT 'q'
 
 void DieWithError(char *errorMessage);
 int fSize(char* file);
@@ -73,29 +74,35 @@ int main(int argc, char *argv[]){
 
 	printf("Msg< %s\n", stringBuffer);	
 
-	/*
-	memset(stringBuffer, 0, STRINGBUFSIZE);
-	strcpy(stringBuffer, "FT");
-	if(send(sock, stringBuffer, STRINGBUFSIZE, 0) != STRINGBUFSIZE)
-		DieWithError("send() sent a different number of bytes than expected");
-
-	printf("Msg> %s\n", stringBuffer);	
-	*/
-	while(operation != 'e'){
+	while(1){
 		if(mode == 1){
 			printf("\nMsg> ");
 			/* Read string through input */
 			scanf(" %s", stringBuffer);
 	
 			//send msgtype
-			msgType = ECHO;
-			if(send(sock, &msgType, 1, 0) != 1)
-				DieWithError("send() sent a different number of bytes than expected");
+			/*
+			*/
+			if(strcmp(stringBuffer, "/quit") == 0){
+				msgType = EXIT;
+				if(send(sock, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
+				
+				break;
+			}
+			
+			else if(strcmp(stringBuffer, "FT") == 0){
 
-			printf("sent msgType: %c\n", msgType);
+				mode = 2;
+				printf("Welcome to Socket FT client!\n");
+			}
+			
+			else{
+				msgType = ECHO;
+				if(send(sock, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
 
-			if(strcmp(stringBuffer, "FT") != 0){
-
+				printf("sent msgType: %c\n", msgType);
 				/* Send inputted string to server */
 				if( send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE){	
 					DieWithError("recv() failed or connection closed prematurely");
@@ -123,18 +130,6 @@ int main(int argc, char *argv[]){
 					//echoBuffer[bytesRcvd] = '\0';
 	       			printf("Msg<- %s\n", stringBuffer);
 				}
-			}
-			else{
-				/* Send inputted string to server */
-				if( send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE){	
-					DieWithError("recv() failed or connection closed prematurely");
-				}
-	
-				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
-					DieWithError("recv() failed");
-				}
-				mode = 2;
-				printf("Welcome to Socket FT client!\n");
 			}
 		}
 
@@ -360,16 +355,18 @@ int main(int argc, char *argv[]){
 				}
 				printf("Sent to server: %s\n", stringBuffer);
 			}
-		}
-		else if(operation == 'e'){
-			mode = 1;
+			else if(operation == 'e'){
+				mode = 1;
+				printf("switching to echo chat mode\n");
+			}
 		}
 	}
-
-	if(send(sock, &operation, 1, 0) != 1)
+	/*
+	msgType = EXIT;
+	if(send(sock, &msgType, 1, 0) != 1)
 		DieWithError("send() sent a different number of bytes than expected");
-
-	printf("Sent msgtype: %c\n", operation);
+	*/
+	printf("Sent msgtype: %c\n", msgType);
 
 	printf("Exiting program.\n");
 	close(sock);

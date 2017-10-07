@@ -10,6 +10,7 @@
 #define LISTFILESREQUEST 'r'
 #define ACK 'a'
 #define ECHO 'c'
+#define EXIT 'q'
 
 void DieWithError(char *errorMessage);
 
@@ -40,15 +41,8 @@ void HandleTCPClient(int clntSocket){
 		DieWithError("send() sent a different number of bytes than expected");
 	
 	printf("Msg> %s\n", stringBuffer);
-	/*
-	memset(stringBuffer, 0, BUFSIZE);
-	if(recv(clntSocket, stringBuffer, BUFSIZE, 0) <0){
-		DieWithError("recv() failed");
-	}
 
-	printf("Msg< %s\n", stringBuffer);
-	*/
-	while(msgType != 'e'){
+	while(msgType != EXIT){
 		memset(fileSizeInString, 0, 20);
 		memset(fileName, 0, 256);
 		memset(fileBuffer, 0, FILEBUFSIZE);
@@ -57,6 +51,7 @@ void HandleTCPClient(int clntSocket){
 		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0){
 			DieWithError("recv() failed");
 		}
+		printf("received msgType:%c", msgType);
 
 		if(msgType == ECHO){
 			totalBytesRcvd = 0;
@@ -85,7 +80,7 @@ void HandleTCPClient(int clntSocket){
 			}
 		}
 		
-		else if(msgType == 'p'){
+		else if(msgType == UPLOADFILEREQUEST){
 			printf("Received msgtype from client:%c\n", msgType);
 	
 
@@ -151,7 +146,7 @@ void HandleTCPClient(int clntSocket){
 
 			printf("sent to client:%s \nawaiting for operation\n", stringBuffer);
 		}
-		else if(msgType == 'g'){
+		else if(msgType == DOWNLOADFILEREQUEST){
 			printf("Received msgtype from client:%c\n", msgType);
 
 			//receive name of file client wants to download
@@ -225,7 +220,7 @@ void HandleTCPClient(int clntSocket){
 			printf("bytes received:%d, received content:%s\n", bytesRcvd, stringBuffer);
 			printf("awaiting for operation\n");
 		}
-		else if(msgType == 'r'){
+		else if(msgType == LISTFILESREQUEST){
 			fp = popen("ls -l", "r");
 			if(fp == NULL){
 				DieWithError("popen failed");
