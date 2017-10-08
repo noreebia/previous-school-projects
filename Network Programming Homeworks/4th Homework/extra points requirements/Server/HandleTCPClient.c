@@ -5,14 +5,16 @@
 #define BUFSIZE 32
 #define FILEBUFSIZE 1024
 
-#define UPLOADFILEREQUEST 'p'
-#define DOWNLOADFILEREQUEST 'g'
-#define LISTFILESREQUEST 'r'
-#define ERROR 'x'
-#define ACK 'a'
-#define ECHO 'c'
-#define EXIT 'q'
-#define READY 'y'
+#define FileUploadReq 'p'
+#define FileDownloadReq 'g'
+#define FileDownloadError 'x'
+#define FileDownloadReady 'y'
+#define ListFilesReq 'r'
+#define FILEACK 'a'
+#define EchoReq 'c'
+#define EchoRep 'h'
+#define Exit 'q'
+
 
 void DieWithError(char *errorMessage);
 
@@ -44,7 +46,7 @@ void HandleTCPClient(int clntSocket){
 	
 	printf("Msg> %s\n\n", stringBuffer);
 
-	while(msgType != EXIT){
+	while(msgType != Exit){
 		memset(fileSizeInString, 0, 20);
 		memset(fileName, 0, 256);
 		memset(fileBuffer, 0, FILEBUFSIZE);
@@ -55,7 +57,7 @@ void HandleTCPClient(int clntSocket){
 		}
 		//printf("received msgType:%c\n", msgType);
 
-		if(msgType == ECHO){
+		if(msgType == EchoReq){
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < BUFSIZE){
 				if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE, 0)) <= 0)
@@ -83,7 +85,7 @@ void HandleTCPClient(int clntSocket){
 					DieWithError("send() sent a different number of bytes than expected");
 			}
 			*/
-			msgType = ECHO;
+			msgType = EchoRep;
 			if(send(clntSocket, &msgType, 1, 0) != 1)
 				DieWithError("send() sent a different number of bytes than expected");
 
@@ -93,7 +95,7 @@ void HandleTCPClient(int clntSocket){
 			printf("Msg>%s\n\n", stringBuffer);
 		}
 		
-		else if(msgType == UPLOADFILEREQUEST){
+		else if(msgType == FileUploadReq){
 			printf("Received msgtype from client:%c\n", msgType);
 
 			//receive name of file clients wants to upload
@@ -112,12 +114,17 @@ void HandleTCPClient(int clntSocket){
 			printf("file size that client will send: %d\n", fileSize);	
 
 			//send ack to client
+			/*
 			strcpy(stringBuffer, "acknowledged");
 			if( send(clntSocket, stringBuffer, BUFSIZE,0) != BUFSIZE){
 				DieWithError("send() failed");
 			}
-
-			printf("sent to client:%s\n", stringBuffer);
+			*/
+			msgType = FILEACK;
+			if(send(clntSocket, &msgType, 1, 0) != 1)
+				DieWithError("send() sent a different number of bytes than expected");
+			
+			printf("sent to client:%c\n", msgType);
 
 			//open file
 			fp = fopen(fileName, "wb");
@@ -149,13 +156,15 @@ void HandleTCPClient(int clntSocket){
 			printf("file received successfully\n");
 
 			//send ack to signal successful file upload
+			/*
 			if( send(clntSocket, stringBuffer, BUFSIZE,0) != BUFSIZE){
 				DieWithError("send() failed");
 			}
 
 			printf("sent to client:%s \nawaiting for operation\n", stringBuffer);
+			*/
 		}
-		else if(msgType == DOWNLOADFILEREQUEST){
+		else if(msgType == FileDownloadReq){
 			printf("Received msgtype from client:%c\n", msgType);
 
 			//receive name of file client wants to download
@@ -171,13 +180,13 @@ void HandleTCPClient(int clntSocket){
 			fp = fopen(fileName, "r");
 			if(fp == NULL){
 				//DieWithError("No such file exists.");
-				msgType = ERROR;
+				msgType = FileDownloadError;
 				if(send(clntSocket, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 				continue;
 			}
 			else{
-				msgType = READY;
+				msgType = FileDownloadReady;
 				if(send(clntSocket, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 			}
@@ -190,10 +199,15 @@ void HandleTCPClient(int clntSocket){
 			printf("Sent file size to client: %s\n", fileSizeInString);
 
 			//receive ack from client
+			/*
 			if( (bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE - 1, 0)) <= 0)
 				DieWithError("recv failed or connection closed prematurely");
-		
-			printf("Received from client: %s\n", stringBuffer);
+			*/
+			if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0){
+				DieWithError("recv() failed");
+			}
+
+			printf("Received from client: %c\n", msgType);
 
 			//sent contents of file to client
 			while( (fread(fileBuffer, 1, FILEBUFSIZE, fp)) > 0){
@@ -210,6 +224,7 @@ void HandleTCPClient(int clntSocket){
 			printf("sent file contents to client:%s\n", fileBuffer);
 
 			//receive ack from client 
+			/*
 			memset(stringBuffer, 0, BUFSIZE);
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < strlen("acknowledged")){
@@ -219,9 +234,10 @@ void HandleTCPClient(int clntSocket){
 				totalBytesRcvd += bytesRcvd;
 			}
 			printf("bytes received:%d, received content:%s\n", bytesRcvd, stringBuffer);
+			*/
 			printf("awaiting for operation\n");
 		}
-		else if(msgType == LISTFILESREQUEST){
+		else if(msgType == ListFilesReq){
 			fp = popen("ls -l", "r");
 			if(fp == NULL){
 				DieWithError("popen failed");
@@ -244,6 +260,7 @@ void HandleTCPClient(int clntSocket){
 			}
 			printf("total bytes sent:%d\n", totalBytesSent);
 			
+			/*
 			totalBytesRcvd = 0;
 			while(totalBytesRcvd < strlen("acknowledged")){
 				if(  (bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE, 0)) < 0)
@@ -256,6 +273,7 @@ void HandleTCPClient(int clntSocket){
 			}
 			
 			printf("total bytes received:%d, received string from client:%s\n", bytesRcvd, stringBuffer);
+			*/
 			printf("awaiting operation\n");
 		}
 	}

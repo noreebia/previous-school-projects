@@ -11,10 +11,21 @@
 #define UPLOADFILEREQUEST 'p'
 #define DOWNLOADFILEREQUEST 'g'
 #define LISTFILESREQUEST 'r'
-#define ERROR 'x'
-#define ACK 'a'
-#define ECHO 'c'
+#define DOWNLOADFIILEERROR 'x'
+#define FILEACK 'a'
+#define ECHOREQ 'c'
+#define ECHOREP 'h'
 #define EXIT 'q'
+
+#define FileUploadReq 'p'
+#define FileDownloadReq 'g'
+#define FileDownloadError 'x'
+#define FileDownloadReady 'y'
+#define ListFilesReq 'r'
+#define FILEACK 'a'
+#define EchoReq 'c'
+#define EchoRep 'h'
+#define Exit 'q'
 
 void DieWithError(char *errorMessage);
 int fSize(char* file);
@@ -83,7 +94,7 @@ int main(int argc, char *argv[]){
 			scanf(" %s", stringBuffer);
 
 			if(strcmp(stringBuffer, "/quit") == 0){
-				msgType = EXIT;
+				msgType = Exit;
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 				
@@ -96,7 +107,7 @@ int main(int argc, char *argv[]){
 			}
 			
 			else{
-				msgType = ECHO;
+				msgType = EchoReq;
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 
@@ -148,7 +159,7 @@ int main(int argc, char *argv[]){
 			operation = command[0];
 
 			if(operation == 'p'){
-				msgType = UPLOADFILEREQUEST;
+				msgType = FileUploadReq;
 
 				printf("Name of file to put on server:");
 				scanf("%s", fileName);
@@ -182,6 +193,7 @@ int main(int argc, char *argv[]){
 				printf("Sent file size to server: %s\n", fileSizeInString);
 
 				//receive acknowledgement
+				/*
 				memset(stringBuffer, 0, STRINGBUFSIZE);
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < strlen("acknowledged")){
@@ -190,8 +202,13 @@ int main(int argc, char *argv[]){
 
 					totalBytesRcvd += bytesRcvd;
 				}
-		
-				printf("Received from server: %s\n", stringBuffer);
+				*/
+
+				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
+					DieWithError("recv() failed");
+				}
+				
+				printf("Received from server: %c\n", msgType);
 				printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
 	
 				//send file contents
@@ -211,6 +228,7 @@ int main(int argc, char *argv[]){
 				printf("%s (%d bytes) uploading succeeded to %s", fileName, fileSize, servIP);
 	
 				//receive acknowledgement
+				/*
 				memset(stringBuffer, 0, STRINGBUFSIZE);
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < strlen("acknowledged")){
@@ -220,9 +238,10 @@ int main(int argc, char *argv[]){
 					totalBytesRcvd += bytesRcvd;
 				}
 				printf("bytes received:%d, received content:%s\n",bytesRcvd, stringBuffer);
+				*/
 			}
 			else if(operation == 'g'){
-				msgType = DOWNLOADFILEREQUEST;
+				msgType = FileDownloadReq;
 
 				printf("Name of file to get from server:");
 				scanf("%s", fileName);
@@ -242,7 +261,7 @@ int main(int argc, char *argv[]){
 				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0)
 					DieWithError("recv() failed");	
 
-				if(msgType == ERROR){
+				if(msgType == FileDownloadError){
 					printf("File with that name does not exist on server. Please try again.\n");
 					continue;
 				}
@@ -268,11 +287,16 @@ int main(int argc, char *argv[]){
 				}
 
 				//send acknowledgement
+				/*
 				strcpy(stringBuffer, "acknowledged");
 				if(send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
+				*/
+				msgType = FILEACK;
+				if(send(sock, &msgType, 1, 0) != 1)
+					DieWithError("send() sent a different number of bytes than expected");
 
-				printf("Sent to server: %s\n", stringBuffer);
+				printf("Sent to server: %c\n", msgType);
 
 				//receive file contents
 				totalBytesRcvd = 0;
@@ -306,10 +330,12 @@ int main(int argc, char *argv[]){
 				printf("%s (%d bytes) downloading succeeded from %s\n", fileName, fileSize, servIP);
 
 				//send acknowledgement of successful file download
+				/*
 				memset(stringBuffer, 0, STRINGBUFSIZE);
 				strcpy(stringBuffer, "acknowledged");
 				if(send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
+				*/
 			}
 		
 			else if(operation == 'l'){
@@ -325,7 +351,7 @@ int main(int argc, char *argv[]){
 			}
 			else if(operation == 'r'){
 				//send msgtype
-				msgType = LISTFILESREQUEST;
+				msgType = ListFilesReq;
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 	
@@ -340,8 +366,9 @@ int main(int argc, char *argv[]){
 					totalBytesRcvd += bytesRcvd;
 				}
 			
-				printf("total received bytes:%d, received contents:%s", totalBytesRcvd, fileBuffer);
+				printf("total received bytes:%d, received contents:%s\n", totalBytesRcvd, fileBuffer);
 
+				/*
 				strcpy(stringBuffer, "acknowledged");
 				totalBytesSent = 0;
 				while(totalBytesSent < strlen(stringBuffer)){
@@ -352,6 +379,7 @@ int main(int argc, char *argv[]){
 					totalBytesSent += bytesSent;
 				}
 				printf("Sent to server: %s\n", stringBuffer);
+				*/
 			}
 
 			else if(operation == 'e'){
