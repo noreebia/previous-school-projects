@@ -178,13 +178,13 @@ int main(int argc, char *argv[]){
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 	
-				printf("Sent msgtype: %c\n", msgType);	
+				//printf("Sent msgtype: %c\n", msgType);	
 				
 				//send file name to upload
 				if(send(sock, fileName, 256, 0) != 256)
 					DieWithError("send() sent a different number of bytes than expected");
 
-				printf("Sent filename to server: %s\n", fileName);
+				//printf("Sent filename to server: %s\n", fileName);
 
 				//send file size
 				if(send(sock, fileSizeInString, 20, 0) != 20)
@@ -208,24 +208,26 @@ int main(int argc, char *argv[]){
 					DieWithError("recv() failed");
 				}
 				
-				printf("Received from server: %c\n", msgType);
-				printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
+				//printf("Received from server: %c\n", msgType);
+				//printf("Contents of file:%s, length of file:%d\n", fileBuffer, strlen(fileBuffer));
 	
+				printf("Sending => ");
 				//send file contents
 				while( fread(fileBuffer, 1, FILEBUFSIZE, fp) > 0){
-					printf("Sending => ##########\n");
 					if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 						DieWithError("send() sent a different number of bytes than expected");
 			
+					printf("#");
 					//printf("Sending => ##########\n");
-					printf("bytes sent:%d\n", bytesSent);				
+					//printf("bytes sent:%d\n", bytesSent);				
 					totalBytesSent += bytesSent;
 					memset(fileBuffer, 0, FILEBUFSIZE);
 				}
 				fclose(fp);
+				printf("\n");
 			
 
-				printf("%s (%d bytes) uploading succeeded to %s", fileName, fileSize, servIP);
+				printf("%s (%d bytes) uploading succeeded to %s\n", fileName, fileSize, servIP);
 	
 				//receive acknowledgement
 				/*
@@ -249,13 +251,13 @@ int main(int argc, char *argv[]){
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 
-				printf("Sent message type: %c\n", msgType);
+				//printf("Sent message type: %c\n", msgType);
 				
 				//send name of file to download;
 				if(send(sock, fileName, 256, 0) != 256)
 					DieWithError("send() sent a different number of bytes than expected");
 
-				printf("Sent name of file that I want to download to server: %s\n", fileName);
+				//printf("Sent name of file that I want to download to server: %s\n", fileName);
 
 				//receive name of file clients wants to upload
 				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0)
@@ -276,10 +278,10 @@ int main(int argc, char *argv[]){
 					totalBytesRcvd += bytesRcvd;
 				}
 			
-				printf("bytes received:%d", bytesRcvd);
+				//printf("bytes received:%d", bytesRcvd);
 				printf("Received file size from server: %s", fileSizeInString);
 				fileSize = atoi(fileSizeInString);
-				printf("Length of file that server will send:%d\n", fileSize);
+				//printf("Length of file that server will send:%d\n", fileSize);
 
 				fp = fopen(fileName, "w");
 				if(fp == NULL){
@@ -298,12 +300,11 @@ int main(int argc, char *argv[]){
 
 				printf("Sent to server: %c\n", msgType);
 
+
 				//receive file contents
+				printf("Receiving => ");
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < fileSize){
-					printf("receiving...\n");
-
-
 					if(fileSize - totalBytesRcvd < FILEBUFSIZE){
 						bytesToWrite = fileSize - totalBytesRcvd;
 					}
@@ -313,19 +314,19 @@ int main(int argc, char *argv[]){
 
 					if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) < 0)
 						DieWithError("recv failed or connection closed prematurely");	
-					printf("received bytes:%d\n", bytesRcvd);
+					
+					//printf("received bytes:%d\n", bytesRcvd);
 
+					printf("#");
 					fwrite(fileBuffer, sizeof(char), bytesToWrite, fp);
-
 					totalBytesRcvd += bytesRcvd; 
 
-					printf("Receiving => ##########\n");
-					//totalBytesRcvd += bytesRcvd;
+					//printf("Receiving => ##########\n");
 					memset(fileBuffer, 0, FILEBUFSIZE);
-				}
-			
+				}			
 				//open file and write
 				fclose(fp);
+				printf("\n");
 
 				printf("%s (%d bytes) downloading succeeded from %s\n", fileName, fileSize, servIP);
 
