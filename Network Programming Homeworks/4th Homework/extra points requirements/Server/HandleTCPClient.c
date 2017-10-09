@@ -59,11 +59,12 @@ void HandleTCPClient(int clntSocket){
 
 		if(msgType == EchoReq){
 			totalBytesRcvd = 0;
-			while(totalBytesRcvd < BUFSIZE){
-				if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE, 0)) <= 0)
+			while(totalBytesRcvd < BUFSIZE-1){
+				if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE-1, 0)) <= 0)
 					DieWithError("recv failed or connection closed prematurely");	
 
 				totalBytesRcvd += bytesRcvd;
+				stringBuffer[bytesRcvd] = '\0';
 			}
 			printf("Msg<%s\n", stringBuffer);
 
@@ -89,7 +90,7 @@ void HandleTCPClient(int clntSocket){
 			if(send(clntSocket, &msgType, 1, 0) != 1)
 				DieWithError("send() sent a different number of bytes than expected");
 
-			if( send(clntSocket, stringBuffer, BUFSIZE,0) != BUFSIZE){
+			if( send(clntSocket, stringBuffer, BUFSIZE-1,0) != BUFSIZE-1){
 				DieWithError("send() failed");
 			}
 			printf("Msg>%s\n\n", stringBuffer);

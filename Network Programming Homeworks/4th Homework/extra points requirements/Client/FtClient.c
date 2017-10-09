@@ -88,6 +88,7 @@ int main(int argc, char *argv[]){
 	printf("Msg< %s\n\n", stringBuffer);	
 
 	while(1){
+
 		if(mode == 1){
 			printf("Msg> ");
 			/* Read string through input */
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]){
 
 				//printf("sent msgType: %c\n", msgType);
 				/* Send inputted string to server */
-				if( send(sock, stringBuffer, STRINGBUFSIZE,0) != STRINGBUFSIZE){	
+				if( send(sock, stringBuffer, STRINGBUFSIZE-1,0) != STRINGBUFSIZE-1){	
 					DieWithError("recv() failed or connection closed prematurely");
 				}
 
@@ -130,20 +131,23 @@ int main(int argc, char *argv[]){
 				memset(stringBuffer, 0, STRINGBUFSIZE);
 				//printf("length of string:%d\n", stringLength);
 				totalBytesRcvd = 0;
-				while(totalBytesRcvd < stringLength){
+				//while(totalBytesRcvd < stringLength){
+				while(totalBytesRcvd < STRINGBUFSIZE-1){
 					//printf("length of string:%d\n", stringLength);
-   	 	   		 	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE , 0)) <= 0){
+   	 	   		 	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE-1, 0)) <= 0){
 						DieWithError("recv failed or connection closed prematurely");
 					}			
    		    	 	totalBytesRcvd += bytesRcvd;
 					//echoBuffer[bytesRcvd] = '\0';
+					stringBuffer[bytesRcvd] = '\0';
 	       			printf("Msg< %s\n\n", stringBuffer);
 				}
+
+			memset(stringBuffer, 0, STRINGBUFSIZE);
 			}
 		}
 
 		else if(mode == 2){
-			memset(stringBuffer, 0, STRINGBUFSIZE);
 			memset(fileName, 0, 256);
 			memset(fileSizeInString, 0, 20);	
 			memset(fileBuffer, 0, FILEBUFSIZE);	
