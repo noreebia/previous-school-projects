@@ -159,7 +159,7 @@ void HandleTCPClient(int clntSocket){
 		
 			printf("%s (%d bytes) received from client\n", fileName, fileSize);
 
-			printf("awaiting for operation\n");
+			printf("Waiting for operation from client...\n\n");
 
 			//send ack to signal successful file upload
 			/*
@@ -246,7 +246,7 @@ void HandleTCPClient(int clntSocket){
 			}
 			printf("bytes received:%d, received content:%s\n", bytesRcvd, stringBuffer);
 			*/
-			printf("awaiting for operation\n");
+			printf("Waiting for operation from client...\n\n");
 		}
 		else if(msgType == ListFilesReq){
 			fp = popen("ls -l", "r");
@@ -254,22 +254,27 @@ void HandleTCPClient(int clntSocket){
 				DieWithError("popen failed");
 			}
 
-			printf("popened");
+			//printf("popened");
 			fread(fileBuffer, FILEBUFSIZE, 1, fp);
 			pclose(fp);
 
-			printf("%s", fileBuffer);
+
 
 			totalBytesSent = 0;
 			while(totalBytesSent < FILEBUFSIZE){
 				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
 			
-				printf("sending list of files on server to client\n");
-				printf("bytes sent:%d\n", bytesSent);				
+				//printf("sending list of files on server to client\n");
+				//printf("bytes sent:%d\n", bytesSent);				
 				totalBytesSent += bytesSent;
 			}
-			printf("total bytes sent:%d\n", totalBytesSent);
+
+			printf("Sent list of files on directory to client:");
+			printf(" %s", fileBuffer);
+
+
+			//printf("total bytes sent:%d\n", totalBytesSent);
 			
 			/*
 			totalBytesRcvd = 0;
@@ -285,10 +290,10 @@ void HandleTCPClient(int clntSocket){
 			
 			printf("total bytes received:%d, received string from client:%s\n", bytesRcvd, stringBuffer);
 			*/
-			printf("awaiting operation\n");
+			printf("Waiting for operation from client...\n\n");
 		}
 	}
-	printf("received:%c\n closing socket.\n", msgType);
+	printf("Client has disconnected.\nClosing socket.\n");
 	close(clntSocket);
 }
 

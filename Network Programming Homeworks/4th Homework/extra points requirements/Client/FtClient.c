@@ -356,18 +356,19 @@ int main(int argc, char *argv[]){
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 	
-				printf("Sent msgtype: %c\n", msgType);
+				//printf("Sent msgtype: %c\n", msgType);
 	
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < FILEBUFSIZE){
 					if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
 						DieWithError("recv failed or connection closed prematurely");	
 					
-					printf("received bytes:%d\n", bytesRcvd);
+					//printf("received bytes:%d\n", bytesRcvd);
 					totalBytesRcvd += bytesRcvd;
 				}
 			
-				printf("total received bytes:%d, received contents:%s\n", totalBytesRcvd, fileBuffer);
+				//printf("total received bytes:%d, received contents:%s\n", totalBytesRcvd, fileBuffer);
+				printf("Files on FT server: %s\n", fileBuffer);
 
 				/*
 				strcpy(stringBuffer, "acknowledged");
