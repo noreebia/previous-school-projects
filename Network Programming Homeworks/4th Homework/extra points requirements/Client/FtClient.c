@@ -135,7 +135,7 @@ int main(int argc, char *argv[]){
 				}
 
 
-				printf("received msgType:%c\n", msgType);
+				//printf("received msgType:%c\n", msgType);
 
 				/* Receive echoed string from server */
 				memset(stringBuffer, 0, STRINGBUFSIZE);

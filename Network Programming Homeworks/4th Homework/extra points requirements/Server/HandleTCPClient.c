@@ -58,7 +58,7 @@ void HandleTCPClient(int clntSocket){
 		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <=0){
 			DieWithError("recv() failed");
 		}
-		printf("received msgType:%c\n", msgType);
+		//printf("received msgType:%c\n", msgType);
 
 		if(msgType == EchoReq){
 			totalBytesRcvd = 0;
@@ -69,10 +69,10 @@ void HandleTCPClient(int clntSocket){
 
 			if((bytesRcvd = recv(clntSocket, echoStringLengthInString, 20, 0)) <0)
 				DieWithError("recv() failed");	
-			printf("%s\n", echoStringLengthInString);
+			//printf("%s\n", echoStringLengthInString);
 
 			echoStringLength = atoi(echoStringLengthInString);
-			printf("%d\n", echoStringLength);
+			//printf("%d\n", echoStringLength);
 			if(echoStringLength > BUFSIZE){
 				totalBytesRcvd = 0;				
 				while(totalBytesRcvd < echoStringLength){
@@ -159,7 +159,7 @@ void HandleTCPClient(int clntSocket){
 			fclose(fp);
 			printf("\n");
 		
-			printf("%s (%d bytes) received from client\n", fileName, fileSize);
+			printf("%s (%d bytes) successfully received from client\n", fileName, fileSize);
 
 			printf("Waiting for operation from client...\n\n");
 		}
@@ -179,6 +179,8 @@ void HandleTCPClient(int clntSocket){
 			fp = fopen(fileName, "r");
 			if(fp == NULL){
 				//DieWithError("No such file exists.");
+				printf("File does not exist. Sending error message to client.\n");
+				printf("Waiting for operation from client...\n\n");
 				msgType = FileDownloadError;
 				if(send(clntSocket, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
@@ -217,7 +219,7 @@ void HandleTCPClient(int clntSocket){
 			fclose(fp);
 			printf("\n");
 
-			printf("%s (%d bytes) sent to client\n", fileName, fileSize);
+			printf("%s (%d bytes) successfully sent to client\n", fileName, fileSize);
 
 			printf("Waiting for operation from client...\n\n");
 		}
