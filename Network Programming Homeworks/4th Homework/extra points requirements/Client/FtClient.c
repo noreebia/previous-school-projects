@@ -55,6 +55,7 @@ int main(int argc, char *argv[]){
 	char msgType;
 	int mode=1;
 	int stringLength;
+	char stringLengthInString[20];
 	FILE *fp;
 
 	printf("server ip : ");
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]){
 			/* Read string through input */
 			scanf(" %s", stringBuffer);
 
+
 			if(strcmp(stringBuffer, "/quit") == 0){
 				msgType = Exit;
 				if(send(sock, &msgType, 1, 0) != 1)
@@ -114,25 +116,33 @@ int main(int argc, char *argv[]){
 
 				//printf("sent msgType: %c\n", msgType);
 				/* Send inputted string to server */
-				if( send(sock, stringBuffer, STRINGBUFSIZE-1,0) != STRINGBUFSIZE-1){	
+				stringLength = strlen(stringBuffer);
+				sprintf(stringLengthInString, "%d", stringLength);
+
+				if( send(sock, stringLengthInString, 20,0) != 20){	
+					DieWithError("recv() failed or connection closed prematurely");
+				}			
+
+				
+				if( send(sock, stringBuffer, stringLength,0) != stringLength){	
 					DieWithError("recv() failed or connection closed prematurely");
 				}
-
+				
 				//printf("sent stringbuffer:%s", stringBuffer);
 		
 				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
 					DieWithError("recv() failed");
 				}
 
-				stringLength = strlen(stringBuffer);
-				//printf("received msgType:%c\n", msgType);
+
+				printf("received msgType:%c\n", msgType);
 
 				/* Receive echoed string from server */
 				memset(stringBuffer, 0, STRINGBUFSIZE);
 				//printf("length of string:%d\n", stringLength);
 				totalBytesRcvd = 0;
 				//while(totalBytesRcvd < stringLength){
-				while(totalBytesRcvd < STRINGBUFSIZE-1){
+				while(totalBytesRcvd < stringLength){
 					//printf("length of string:%d\n", stringLength);
    	 	   		 	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE-1, 0)) <= 0){
 						DieWithError("recv failed or connection closed prematurely");
@@ -141,9 +151,9 @@ int main(int argc, char *argv[]){
 					//echoBuffer[bytesRcvd] = '\0';
 					stringBuffer[bytesRcvd] = '\0';
 	       			printf("Msg< %s\n\n", stringBuffer);
+					memset(stringBuffer, 0, STRINGBUFSIZE);
 				}
-
-			memset(stringBuffer, 0, STRINGBUFSIZE);
+				//memset(stringBuffer, 0, STRINGBUFSIZE);
 			}
 		}
 
