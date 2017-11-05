@@ -20,6 +20,7 @@ void main(){
 	unsigned int clntLen;
 	int strLen;
 	char buffer[BUFSIZE];
+	int addr_size;
 
 	if((servSock = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
 		DieWithError("socket() failed");
@@ -36,26 +37,26 @@ void main(){
 		DieWithError("bind() failed");
 
 	/*
-	if(listen(servSock, MAXPENDING) < 0)
-		DieWithError("listen() failed");
+	memset(buffer, 0, BUFSIZE);
+	strLen = recvfrom(servSock, buffer, BUFSIZE, 0, (struct sockaddr*)&echoClntAddr, &clntLen);
+	printf("msg<%s\n", buffer);
+
+	if(!strcmp(buffer, "hello")){
+		memset(buffer, 0, BUFSIZE);
+		strcpy(buffer, "hi");
+		sendto(servSock, buffer, strLen, 0, (struct sockaddr*)&echoClntAddr, sizeof(echoClntAddr));
+		printf("msg>%s\n", buffer);
+	}
 	*/
 
 	while(1){
 		clntLen = sizeof(echoClntAddr);
-	
-		/*
-		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
-			DieWithError("accept() failed");
-		*/
 		
-		
+		memset(buffer, 0, BUFSIZE);
 		strLen = recvfrom(servSock, buffer, BUFSIZE, 0, (struct sockaddr*)&echoClntAddr, &clntLen);
+		printf("msg<%s\n", buffer);
 
-		printf("> %s", buffer);		
-
-		/*
-		HandleTCPClient(clntSock);
-		*/
-		printf("Listening again.\n\n");
+		sendto(servSock, buffer, strLen, 0, (struct sockaddr*)&echoClntAddr, sizeof(echoClntAddr));
+		printf("msg>%s\n", buffer);
 	}
 }
