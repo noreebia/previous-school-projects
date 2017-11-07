@@ -5,7 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MAXPENDING 5
 #define BUFSIZE 32
 
 void DieWithError(char *errorMessage);
@@ -22,7 +21,7 @@ void main(){
 	char buffer[BUFSIZE];
 	int addr_size;
 
-	if((servSock = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
+	if((servSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
 		DieWithError("socket() failed");
 
 	if (setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
@@ -50,13 +49,27 @@ void main(){
 	*/
 
 	while(1){
-		clntLen = sizeof(echoClntAddr);
-		
+		clntLen = sizeof(echoClntAddr);	
 		memset(buffer, 0, BUFSIZE);
+		
+		if((strLen = recvfrom(servSock, buffer, BUFSIZE, 0, (struct sockaddr*)&echoClntAddr, &clntLen)) < 0 ){
+			DieWithError("recvfrom() failed");
+		}
+		/*
 		strLen = recvfrom(servSock, buffer, BUFSIZE, 0, (struct sockaddr*)&echoClntAddr, &clntLen);
-		printf("msg<%s\n", buffer);
+		*/
+		printf("Received UDP packet from client.\n");
+		printf("Client IP: %s\n", inet_ntoa(echoClntAddr.sin_addr));
+		printf("Cleint Port: %d\n", ntohs(echoClntAddr.sin_port));
 
+		printf("msg<%s\n", buffer);
+	
+		if(sendto(servSock, buffer, strLen, 0, (struct sockaddr*)&echoClntAddr, sizeof(echoClntAddr)) < 0){
+			DieWithError("sendto() failed.");
+		}
+		/*
 		sendto(servSock, buffer, strLen, 0, (struct sockaddr*)&echoClntAddr, sizeof(echoClntAddr));
-		printf("msg>%s\n", buffer);
+		*/
+		printf("msg>%s\n\n", buffer);
 	}
 }

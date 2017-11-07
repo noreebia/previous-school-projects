@@ -29,11 +29,13 @@ int main(int argc, char *argv[]){
 	printf("Port: ");
 	scanf("%hu", &echoServPort);
 	
+	/* Construct server address structure */
 	memset(&serverAddress, 0, sizeof(serverAddress));
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = inet_addr(servIP);
 	serverAddress.sin_port = htons(echoServPort);
 
+	/* Create UDP socket */
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(sock < 0){
 		DieWithError("socket() failed");
@@ -52,10 +54,10 @@ int main(int argc, char *argv[]){
 	printf("msg<%s\n", recvBuffer);	
 	*/
 
-	printf("Commencing echo chat.\n");
+	printf("Commencing UDP echo chat.\n\n");
 
 	while(1){
-		printf("\nmsg>");
+		printf("msg>");
 		scanf("%s", sendBuffer);
 		sendBufferLength = strlen(sendBuffer);
 
@@ -63,14 +65,23 @@ int main(int argc, char *argv[]){
 			break;
 		}
 
-		sendto(sock, sendBuffer, sendBufferLength, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
-				
-		memset(recvBuffer, 0, BUFSIZE);
-		strLen = recvfrom(sock, recvBuffer, BUFSIZE, 0, (struct sockaddr*)&from_addr, &addr_size);
-		recvBuffer[strLen] = 0;
-		printf("msg<%s", recvBuffer);		
-	}
+		if(sendto(sock, sendBuffer, sendBufferLength, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0){
+			DieWithError("sendto() failed");
+		}
 
+		/*
+		sendto(sock, sendBuffer, sendBufferLength, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+		*/
+	
+		memset(recvBuffer, 0, BUFSIZE);
+		addr_size = sizeof(from_addr);
+		strLen = recvfrom(sock, recvBuffer, BUFSIZE, 0, (struct sockaddr*)&from_addr, &addr_size);
+		if(strLen < 0){
+			DieWithError("recvfrom() failed");
+		}		
+		recvBuffer[strLen] = 0;
+		printf("msg<%s\n\n", recvBuffer);		
+	}
 	printf("Exiting program.\n");
 	close(sock);
 	exit(0);
