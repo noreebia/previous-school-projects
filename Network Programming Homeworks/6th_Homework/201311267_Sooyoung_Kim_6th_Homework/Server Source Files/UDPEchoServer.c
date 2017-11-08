@@ -46,7 +46,7 @@ void main(){
 		/* Display client info */
 		printf("Received UDP packet from client.\n");
 		printf("Client IP: %s\n", inet_ntoa(echoClntAddr.sin_addr));
-		printf("Cleint Port: %d\n", ntohs(echoClntAddr.sin_port));
+		printf("Client Port: %d\n", ntohs(echoClntAddr.sin_port));
 
 		printf("msg<%s\n", buffer);
 		
