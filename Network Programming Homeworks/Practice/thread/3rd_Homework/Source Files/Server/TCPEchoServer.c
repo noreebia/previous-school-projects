@@ -4,12 +4,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 
+#define RCVBUFSIZE 32
 #define MAXPENDING 5
 
 void DieWithError(char *errorMessage);
-void HandleTCPClient(int clntSocket);
+void *HandleTCPClient(void *socket);
 
+int chatSockets[2] = {0,0};
+
+int connectionCount = 0;
 void main(){
 	int servSock;
 	int clntSock;
@@ -60,7 +65,6 @@ void main(){
 	if(listen(chatSock, MAXPENDING) < 0)
 		DieWithError("listen() failed");
 
-
 	while(1){
 		clntLen = sizeof(echoClntAddr);
 		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
@@ -78,7 +82,79 @@ void main(){
 		printf("Client IP : %s\n", inet_ntoa(chatClientAddr.sin_addr));
 		printf("Port : %hu\n", ntohs(chatClientAddr.sin_port));
 
-		HandleTCPClient(clntSock);
+
+
+		chatSockets[connectionCount] = chatClientSock;
+		printf("current connection count: %d", connectionCount);
+		//HandleTCPClient(clntSock);
+		pthread_t threadID;
+		int threadCreation = pthread_create(&threadID, NULL, HandleTCPClient, (void *)clntSock);
+		if(threadCreation){
+			DieWithError("Thread creation failed");
+		}else{
+			printf("succseefully created thread.\n");
+		}
+		connectionCount++;
+
 		printf("Listening again.\n\n");
 	}
+}
+
+void *HandleTCPClient(void *socket){
+	int clntSocket = (int)socket;
+	char echoBuffer[RCVBUFSIZE];
+	char *connectionInitString = "hi";
+	int recvMsgSize;
+
+	/* Clear the echoBuffer */
+	memset(echoBuffer, 0, RCVBUFSIZE);
+	
+	/* Receive string from client */
+	if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) <0)
+		DieWithError("recv() failed");
+	
+	/*Display received string*/
+	printf("msg<- %s\n",echoBuffer);
+
+	/* If client sent "hello", reply with "hi" */
+	if( strcmp(echoBuffer, "hello") == 0){
+		if(send(clntSocket, connectionInitString, strlen(connectionInitString), 0) < 0){
+			DieWithError("send() failed");
+		}
+		printf("msg-> %s\n", connectionInitString);
+	}	
+	
+	printf("Commencing echo chat.\n\n");
+
+	/* Clear the buffer that stores the string that will be received and sent back */
+	memset(echoBuffer, 0, RCVBUFSIZE);
+	
+	while( recvMsgSize > 0){
+		/* Receive string from client */
+		if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) <0)
+			DieWithError("recv() failed");	
+		printf("msg<- %s\n", echoBuffer);
+
+		/* Send to client the same exact string*/
+		/*
+		if(send(clntSocket, echoBuffer, recvMsgSize, 0) != recvMsgSize)
+			DieWithError("send() failed");
+		printf("msg-> %s\n\n", echoBuffer);
+		*/
+		int i;
+		for(i=0;i<connectionCount;i++){
+			if(chatSockets[i] > 0){
+				if(send(chatSockets[i], echoBuffer, recvMsgSize, 0) != recvMsgSize)
+					DieWithError("send() failed");
+				printf("msg-> %s\n\n", echoBuffer);
+			}
+			else{
+				printf("empty chat socket: %d\n", i);
+			}
+		}
+		/* Clear the buffer */
+		memset(echoBuffer, 0, RCVBUFSIZE);
+	}
+	printf("Closing socket.\n");
+	close(clntSocket);
 }

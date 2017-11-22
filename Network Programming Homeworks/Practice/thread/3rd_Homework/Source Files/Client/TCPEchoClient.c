@@ -9,6 +9,10 @@
 #define RCVBUFSIZE 32
 
 void DieWithError(char *errorMessage);
+void *threadFunction(void *socket);
+
+char echoBuffer[RCVBUFSIZE];
+int bytesRcvd;
 
 int main(int argc, char *argv[]){
 	int sock, sock2;
@@ -17,9 +21,9 @@ int main(int argc, char *argv[]){
 	unsigned short echoServPort;
 	char servIP[20];
 	char echoString[RCVBUFSIZE];
-	char echoBuffer[RCVBUFSIZE];
+
 	unsigned int echoStringLen;
-	int bytesRcvd, totalBytesRcvd;
+	int totalBytesRcvd;
 
 	/* Display IP and port of server */
 	//printf("Server ip: %s\n", inet_ntoa(echoServAddr.sin_addr));
@@ -83,6 +87,14 @@ int main(int argc, char *argv[]){
 	}
 	
 	printf("Commencing echo chat.\n");
+	pthread_t threadID;
+
+	int threadCreation = pthread_create(&threadID, NULL, threadFunction, (void *)sock2);
+	if(threadCreation){
+		DieWithError("Thread creation failed");
+	}else{
+		printf("thread created successfully\n");
+	}
 
 	/* Keep echo chatting as long as "/quit" is not entered */
 	while(strcmp(echoString, "/quit") != 0){
@@ -97,9 +109,10 @@ int main(int argc, char *argv[]){
 		}
 		
 		/* Clear the buffer that stores the string that will be sent to the server */
-		memset(echoBuffer, 0, RCVBUFSIZE);
+		//memset(echoBuffer, 0, RCVBUFSIZE);
 
 		/* Receive echoed string from server */
+		/*
 		totalBytesRcvd = 0;
 		while(totalBytesRcvd < echoStringLen){
         	if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0){
@@ -109,6 +122,7 @@ int main(int argc, char *argv[]){
 			echoBuffer[bytesRcvd] = '\0';
        		printf("msg<- %s\n", echoBuffer);
 		}
+		*/
 	}
 	/* Exit the program if "/quit" is entered as input */
 	printf("\nClosing socket.\nExiting program.\n");
@@ -116,12 +130,14 @@ int main(int argc, char *argv[]){
 	exit(0);
 }
 
-void threadFunction(void* socket){
-	int socket = (int)socket;
+void *threadFunction(void *listeningSocket){
+	int socket = (int)listeningSocket;
 	while(1){
-        if((bytesRcvd = recv(sock, echoBuffer, RCVBUFSIZE -1, 0)) <= 0){
+        if((bytesRcvd = recv(socket, echoBuffer, RCVBUFSIZE -1, 0)) <= 0){
 			DieWithError("recv failed or connection closed prematurely");
 		}	
+		echoBuffer[bytesRcvd] = '\0';
     	printf("msg<- %s\n", echoBuffer);	
+		memset(echoBuffer, 0, RCVBUFSIZE);
 	}
 }
