@@ -8,6 +8,8 @@
 
 #define MAXPENDING 5
 
+#define NUMOFCHATSOCKETS 10
+
 #define BUFSIZE 32
 #define FILEBUFSIZE 1024
 
@@ -25,15 +27,29 @@ void DieWithError(char *errorMessage);
 void *HandleTCPClient(void *clientSocket);
 int fSize(char* file);
 
+struct ClientInfo{
+	int clientMainSocket;
+	int clientChatSocket;
+};
+
+int chatSockets[NUMOFCHATSOCKETS] = {0};
+int connectionCount = 0;
+
 int main(int argc, char *argv[])
 {
-	int servSock;
-	int clntSock;
-	struct sockaddr_in echoServAddr;
-	struct sockaddr_in echoClntAddr;
-	unsigned short echoServPort = 1080;
-	unsigned int clntLen;
+	int serverMainSocket;
+	int clientMainSocket;
+	struct sockaddr_in serverMainAddress;
+	struct sockaddr_in clientMainAddress;
+	unsigned short mainServerPort = 1080;
+	unsigned int clientMainLength;
 
+	int serverChatSocket;
+	int clientChatSocket;
+	struct sockaddr_in serverChatAddress;
+	struct sockaddr_in clientChatAddress;
+	unsigned short chatServPort = 1081;
+	unsigned int clientChatLength;
 	/*
 	if(argc != 2){
 		fprintf(stderr, "Usage: %s <Server Port>\n", argv[0]);
@@ -41,38 +57,76 @@ int main(int argc, char *argv[])
 	}
 	*/
 
-	if((servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+	if((serverMainSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		DieWithError("socket() failed");
 
-	if (setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
+	if (setsockopt(serverMainSocket, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
 	    DieWithError("setsockopt(SO_REUSEADDR) failed");
 
 
-	memset(&echoServAddr, 0, sizeof(echoServAddr));
-	echoServAddr.sin_family = AF_INET;
-	echoServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	echoServAddr.sin_port = htons(echoServPort);
+	memset(&serverMainAddress, 0, sizeof(serverMainAddress));
+	serverMainAddress.sin_family = AF_INET;
+	serverMainAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	serverMainAddress.sin_port = htons(mainServerPort);
 
-	if(bind(servSock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
+	if(bind(serverMainSocket, (struct sockaddr *) &serverMainAddress, sizeof(serverMainAddress)) < 0)
 		DieWithError("bind() failed");
 
-	if(listen(servSock, MAXPENDING) < 0)
+	if(listen(serverMainSocket, MAXPENDING) < 0)
 		DieWithError("listen() failed");
+
+	//chat socket
+	if((serverChatSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+		DieWithError("socket() failed");
+
+	if (setsockopt(serverChatSocket, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
+	    DieWithError("setsockopt(SO_REUSEADDR) failed");
+
+
+	memset(&serverChatAddress, 0, sizeof(serverChatAddress));
+	serverChatAddress.sin_family = AF_INET;
+	serverChatAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	serverChatAddress.sin_port = htons(chatServPort);
+
+	if(bind(serverChatSocket, (struct sockaddr *) &serverChatAddress, sizeof(serverChatAddress)) < 0)
+		DieWithError("bind() failed");
+
+	if(listen(serverChatSocket, MAXPENDING) < 0)
+		DieWithError("listen() failed");
+
 
 	while(1){
 		printf("Listening for clients...\n");
 
-		clntLen = sizeof(echoClntAddr);
+		clientMainLength = sizeof(clientMainAddress);
 	
-		if((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr, &clntLen)) < 0)
+		if((clientMainSocket = accept(serverMainSocket, (struct sockaddr *) &clientMainAddress, &clientMainLength)) < 0)
 			DieWithError("accept() failed");
 
-		printf("Client IP : %s\n", inet_ntoa(echoClntAddr.sin_addr));
-		printf("Port : %hu\n", ntohs(echoClntAddr.sin_port));
+		clientChatLength = sizeof(clientChatAddress);
+	
+		if((clientChatSocket = accept(serverChatSocket, (struct sockaddr *) &clientChatAddress, &clientChatLength)) < 0)
+			DieWithError("accept() failed");
+
+		printf("Client IP : %s\n", inet_ntoa(clientMainAddress.sin_addr));
+		printf("Client Main Port : %hu\n", ntohs(clientMainAddress.sin_port));
+		printf("Client Chat Port : %hu\n", ntohs(clientChatAddress.sin_port));
+
+		chatSockets[connectionCount] = clientChatSocket;
+		connectionCount++;
+
+		struct ClientInfo *newClientInfo = (struct ClientInfo*) malloc(sizeof(struct ClientInfo));
+
+		if(newClientInfo == NULL){
+			DieWithError("ClientInfo struct creation failed");
+		}
+
+		newClientInfo->clientMainSocket = clientMainSocket;
+		newClientInfo->clientChatSocket = clientChatSocket;
 
 		pthread_t threadID;
-		int newConnectionSocket = clntSock;
-		int threadCreation = pthread_create(&threadID, NULL, HandleTCPClient, (void *)newConnectionSocket);
+		//int newConnectionSocket = clientMainSocket;
+		int threadCreation = pthread_create(&threadID, NULL, HandleTCPClient, newClientInfo);
 		if(threadCreation){
 			DieWithError("error creating thread");
 		}
@@ -85,8 +139,10 @@ int main(int argc, char *argv[])
 	}	
 }
 
-void *HandleTCPClient(void *clientSocket){
-	int clntSocket = (int)clientSocket;
+void *HandleTCPClient(void *clientInfo){
+	int clntSocket = ((struct ClientInfo*)clientInfo) -> clientMainSocket;
+	int clntChatSocket = ((struct ClientInfo*)clientInfo) -> clientChatSocket;
+
 	int fileSize;
 	int bytesToWrite;
 	int totalBytesSent, bytesSent;

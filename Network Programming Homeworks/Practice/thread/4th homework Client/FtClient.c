@@ -22,12 +22,19 @@ void DieWithError(char *errorMessage);
 int fSize(char* file);
 
 int main(int argc, char *argv[]){
-	unsigned short serverPort;
+	unsigned short serverMainPort = 1080;
+	unsigned short serverChatPort = 1081;
 	char servIP[20];
 
 	struct sockaddr_in echoServAddr;
+
+	struct sockaddr_in chatServAddr;
+
 	unsigned int echoStringLen;
 	int sock;
+
+	int chatSock;
+
 	int fileSize;
 	int bytesToWrite;
 	int bytesRcvd, totalBytesRcvd;
@@ -49,18 +56,31 @@ int main(int argc, char *argv[]){
 	printf("Server ip : ");
 	scanf("%s", servIP);
 	/* receive port of server */
-	printf("Port : ");
-	scanf("%hu", &serverPort);
+	//printf("Port : ");
+	//scanf("%hu", &serverPort);
 
+	//main socket
 	if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		DieWithError("socket() failed");
 
 	memset(&echoServAddr, 0, sizeof(echoServAddr));
 	echoServAddr.sin_family = AF_INET;
 	echoServAddr.sin_addr.s_addr = inet_addr(servIP);
-	echoServAddr.sin_port = htons(serverPort);
+	echoServAddr.sin_port = htons(serverMainPort);
 
 	if(connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))<0)
+		DieWithError("connect() failed");
+
+	//chat socket
+	if((chatSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+		DieWithError("socket() failed");
+
+	memset(&chatServAddr, 0, sizeof(chatServAddr));
+	chatServAddr.sin_family = AF_INET;
+	chatServAddr.sin_addr.s_addr = inet_addr(servIP);
+	chatServAddr.sin_port = htons(serverChatPort);
+
+	if(connect(chatSock, (struct sockaddr *) &chatServAddr, sizeof(chatServAddr))<0)
 		DieWithError("connect() failed");
 
 	/* send "hello "*/
