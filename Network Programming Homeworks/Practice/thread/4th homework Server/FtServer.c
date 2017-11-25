@@ -376,6 +376,14 @@ void *HandleTCPClient(void *clientInfo){
 		}
 	}
 	printf("Client has disconnected.\nClosing socket.\n");
+	for(int i=0; i<NUMOFCHATSOCKETS;i++){
+		if(chatSockets[i] == clntChatSocket){
+			printf("changed sockets back to 0\n");
+			chatSockets[i] = 0;
+			break;
+		}
+	}
+	close(clntChatSocket);
 	close(clntSocket);
 }
 

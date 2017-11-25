@@ -355,12 +355,12 @@ void *listenToSocket(void *chatSocket){
 	int receivedBytes;
 	char chatBuffer[STRINGBUFSIZE];
 	while(1){
+		memset(chatBuffer, 0, STRINGBUFSIZE);
         if((receivedBytes = recv(socket, chatBuffer, STRINGBUFSIZE -1, 0)) <= 0){
 			DieWithError("recv failed or connection closed prematurely");
 		}	
 		chatBuffer[STRINGBUFSIZE] = '\0';
     	printf("msg<- %s\n", chatBuffer);	
-		memset(chatBuffer, 0, STRINGBUFSIZE);
 	}
 }
 
