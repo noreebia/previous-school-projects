@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #define STRINGBUFSIZE 32
 #define FILEBUFSIZE 1024
@@ -19,6 +20,7 @@
 #define Exit 'q'
 
 void DieWithError(char *errorMessage);
+void *listenToSocket(void *chatSocket);
 int fSize(char* file);
 
 int main(int argc, char *argv[]){
@@ -98,6 +100,10 @@ int main(int argc, char *argv[]){
 
 	printf("Msg< %s\n\n", stringBuffer);	
 
+	pthread_t threadID;
+
+	int threadCreation = pthread_create(&threadID, NULL, listenToSocket, (void *)chatSock);
+
 	while(1){
 		/* echo string mode */
 		if(mode == 1){
@@ -137,13 +143,14 @@ int main(int argc, char *argv[]){
 					DieWithError("recv() failed or connection closed prematurely");
 				}
 				
-		
+				/*
 				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
 					DieWithError("recv() failed");
 				}
-
+				*/
 
 				/* receive echoed string from server */
+				/*
 				memset(stringBuffer, 0, STRINGBUFSIZE);
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < stringLength){
@@ -155,6 +162,7 @@ int main(int argc, char *argv[]){
 	       			printf("Msg< %s\n\n", stringBuffer);
 					memset(stringBuffer, 0, STRINGBUFSIZE);
 				}
+				*/
 				//memset(stringBuffer, 0, STRINGBUFSIZE);
 			}
 		}
@@ -340,6 +348,20 @@ int main(int argc, char *argv[]){
 	printf("Exiting program.\n");
 	close(sock);
 	exit(0);
+}
+
+void *listenToSocket(void *chatSocket){
+	int socket = (int) chatSocket;
+	int receivedBytes;
+	char chatBuffer[STRINGBUFSIZE];
+	while(1){
+        if((receivedBytes = recv(socket, chatBuffer, STRINGBUFSIZE -1, 0)) <= 0){
+			DieWithError("recv failed or connection closed prematurely");
+		}	
+		chatBuffer[STRINGBUFSIZE] = '\0';
+    	printf("msg<- %s\n", chatBuffer);	
+		memset(chatBuffer, 0, STRINGBUFSIZE);
+	}
 }
 
 /* function that returns size of file */

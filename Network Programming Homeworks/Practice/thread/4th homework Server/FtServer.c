@@ -188,13 +188,15 @@ void *HandleTCPClient(void *clientInfo){
 		if(msgType == EchoReq){
 			totalBytesRcvd = 0;
 
+			/*
 			msgType = EchoRep;
 			if(send(clntSocket, &msgType, 1, 0) != 1)
 				DieWithError("send() sent a different number of bytes than expected");
+			*/
 
 			if((bytesRcvd = recv(clntSocket, echoStringLengthInString, 20, 0)) <0)
 				DieWithError("recv() failed");	
-
+			
 			echoStringLength = atoi(echoStringLengthInString);
 			if(echoStringLength > BUFSIZE){	/* if string length exceeds buffer length */
 				totalBytesRcvd = 0;				
@@ -202,9 +204,17 @@ void *HandleTCPClient(void *clientInfo){
 					if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE-1, 0)) <0)
 						DieWithError("recv() failed");	
 					printf("Msg<%s\n", stringBuffer);
-
+					/*
 					if( send(clntSocket, stringBuffer, bytesRcvd,0) != bytesRcvd){
 						DieWithError("send() failed");
+					}
+					*/
+					for(int i=0;i<NUMOFCHATSOCKETS;i++){
+						if(chatSockets[i] != 0 && chatSockets[i] != clntChatSocket){
+							if( send(chatSockets[i], stringBuffer, bytesRcvd,0) != bytesRcvd){
+								DieWithError("send() failed");
+							}				
+						}
 					}
 					printf("Msg>%s\n", stringBuffer);
 					totalBytesRcvd += bytesRcvd;
@@ -215,9 +225,17 @@ void *HandleTCPClient(void *clientInfo){
 				if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE, 0)) <0)
 					DieWithError("recv() failed");	
 				printf("Msg<%s\n", stringBuffer);
-
+				/*
 				if( send(clntSocket, stringBuffer, bytesRcvd,0) != bytesRcvd){
 					DieWithError("send() failed");
+				}
+				*/
+				for(int i=0;i<NUMOFCHATSOCKETS;i++){
+					if(chatSockets[i] != 0 && chatSockets[i] != clntChatSocket){
+						if( send(chatSockets[i], stringBuffer, bytesRcvd,0) != bytesRcvd){
+							DieWithError("send() failed");
+						}				
+					}
 				}
 				printf("Msg>%s\n", stringBuffer);
 			}
