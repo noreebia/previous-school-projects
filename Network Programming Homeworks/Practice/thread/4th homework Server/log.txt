@@ -1,0 +1,39 @@
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 60882, Client Chat Port : 45758
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 60886, Client Chat Port : 45762
+Client has sent chat message:yoyoyo Client IP:127.0.0.1, Client Chat Port:45762
+Client has sent chat message:yeeeehaw Client IP:127.0.0.1, Client Chat Port:45758
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:60882
+total 52
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13549 11월 27 21:05 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  7679 11월 27 19:40 HandleTCPClient.c
+-rw-r--r-- 1 noreebia noreebia   362 11월 27 21:07 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 27 21:05 Server
+
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:60886
+total 52
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13549 11월 27 21:05 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  7679 11월 27 19:40 HandleTCPClient.c
+-rw-r--r-- 1 noreebia noreebia   788 11월 27 21:07 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 27 21:05 Server
+
+Received file 'FtClient.c' from main port of client. Client IP: 127.0.0.1, Client Main Port: 60886
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:60886
+total 64
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 10515 11월 27 21:08 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 13549 11월 27 21:05 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  7679 11월 27 19:40 HandleTCPClient.c
+-rw-r--r-- 1 noreebia noreebia  1313 11월 27 21:08 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 27 21:05 Server
+
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:60882
+total 64
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 10515 11월 27 21:08 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 13549 11월 27 21:05 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  7679 11월 27 19:40 HandleTCPClient.c
+-rw-r--r-- 1 noreebia noreebia  1802 11월 27 21:10 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 27 21:05 Server
+

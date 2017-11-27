@@ -1,0 +1,17 @@
+New client has connected. Client IP : 127.0.0.1
+Client Main Port : 5
+Client Chat Port : 6
+
+
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 5, Client Chat Port : 6
+
+hello
+
+Sent list of files on directory to client: total 52
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 12754 11월 27 20:37 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  7679 11월 27 19:40 HandleTCPClient.c
+-rw-r--r-- 1 noreebia noreebia   192 11월 27 20:38 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18200 11월 27 20:38 Server
+
+

@@ -25,9 +25,13 @@
 
 void DieWithError(char *errorMessage);
 void *HandleTCPClient(void *clientSocket);
+void writeLog(char contents[]);
 int fSize(char* file);
 
 struct ClientInfo{
+	char ip[20];
+	unsigned short clientMainPort;
+	unsigned short clientChatPort;
 	int clientMainSocket;
 	int clientChatSocket;
 };
@@ -108,9 +112,6 @@ int main(int argc, char *argv[])
 		if((clientChatSocket = accept(serverChatSocket, (struct sockaddr *) &clientChatAddress, &clientChatLength)) < 0)
 			DieWithError("accept() failed");
 
-		printf("Client IP : %s\n", inet_ntoa(clientMainAddress.sin_addr));
-		printf("Client Main Port : %hu\n", ntohs(clientMainAddress.sin_port));
-		printf("Client Chat Port : %hu\n", ntohs(clientChatAddress.sin_port));
 
 		chatSockets[connectionCount] = clientChatSocket;
 		connectionCount++;
@@ -121,6 +122,9 @@ int main(int argc, char *argv[])
 			DieWithError("ClientInfo struct creation failed");
 		}
 
+		strcpy(newClientInfo->ip, inet_ntoa(clientMainAddress.sin_addr));
+		newClientInfo->clientMainPort = ntohs(clientMainAddress.sin_port);
+		newClientInfo->clientChatPort = ntohs(clientChatAddress.sin_port);
 		newClientInfo->clientMainSocket = clientMainSocket;
 		newClientInfo->clientChatSocket = clientChatSocket;
 
@@ -140,6 +144,9 @@ int main(int argc, char *argv[])
 }
 
 void *HandleTCPClient(void *clientInfo){
+	char clntIP[20];
+	unsigned short clntMainPort = ((struct ClientInfo*)clientInfo) -> clientMainPort;
+	unsigned short clntChatPort = ((struct ClientInfo*)clientInfo) -> clientChatPort;
 	int clntSocket = ((struct ClientInfo*)clientInfo) -> clientMainSocket;
 	int clntChatSocket = ((struct ClientInfo*)clientInfo) -> clientChatSocket;
 
@@ -147,14 +154,24 @@ void *HandleTCPClient(void *clientInfo){
 	int bytesToWrite;
 	int totalBytesSent, bytesSent;
 	int bytesRcvd, totalBytesRcvd;
+	int echoStringLength;
 	char fileSizeInString[20];
 	char fileName[256];
 	char stringBuffer[BUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
 	char msgType=0;
 	char echoStringLengthInString[20];
-	int echoStringLength;
+	char logBuffer[1024];
 	FILE *fp;
+
+	strcpy(clntIP, ((struct ClientInfo*)clientInfo) -> ip);
+
+	printf("Client IP : %s\n", clntIP);
+	printf("Client Main Port : %d\n", clntMainPort);
+	printf("Client Chat Port : %d\n", clntChatPort);
+
+	sprintf(logBuffer, "New client has connected. Client IP : %s, Client Main Port : %d, Client Chat Port : %d", clntIP, clntMainPort, clntChatPort);
+	writeLog(logBuffer);
 
 	/* receive "hello" */
 	memset(stringBuffer, 0, BUFSIZE);
@@ -179,6 +196,7 @@ void *HandleTCPClient(void *clientInfo){
 		memset(fileBuffer, 0, FILEBUFSIZE);
 		memset(stringBuffer, 0, BUFSIZE);
 		memset(echoStringLengthInString, 0, 20);
+		memset(logBuffer, 0, 1024);
 		
 		/* receive msgType from client */
 		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <=0){
@@ -218,6 +236,9 @@ void *HandleTCPClient(void *clientInfo){
 					}
 					printf("Msg>%s\n", stringBuffer);
 					totalBytesRcvd += bytesRcvd;
+
+					sprintf(logBuffer, "Client has sent chat message:%s Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
+					writeLog(logBuffer);
 					memset(stringBuffer, 0, BUFSIZE);
 				}
 			}
@@ -237,7 +258,8 @@ void *HandleTCPClient(void *clientInfo){
 						}				
 					}
 				}
-				printf("Msg>%s\n", stringBuffer);
+				sprintf(logBuffer, "Client has sent chat message:%s Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
+				writeLog(logBuffer);
 			}
 		}
 		
@@ -290,6 +312,8 @@ void *HandleTCPClient(void *clientInfo){
 			}
 			fclose(fp);
 			printf("\n");
+			sprintf(logBuffer, "Received file '%s' from main port of client. Client IP: %s, Client Main Port: %hu", fileName, clntIP, clntMainPort);
+			writeLog(logBuffer);
 		
 			printf("%s (%d bytes) successfully received from client\n", fileName, fileSize);
 
@@ -322,7 +346,6 @@ void *HandleTCPClient(void *clientInfo){
 					DieWithError("send() sent a different number of bytes than expected");
 			}
 
-
 			/* send size of file client wants to download */
 			if(send(clntSocket, fileSizeInString, 20, 0) != 20)
 				DieWithError("send() sent a different number of bytes than expected");
@@ -346,9 +369,10 @@ void *HandleTCPClient(void *clientInfo){
 			}			
 			fclose(fp);
 			printf("\n");
+			sprintf(logBuffer, "Sent file '%s' to main port of client. Client IP:%s, Client Main Port:%hu", fileName, clntIP, clntMainPort);
+			writeLog(logBuffer);
 
 			printf("%s (%d bytes) successfully sent to client\n", fileName, fileSize);
-
 			printf("Waiting for operation from client...\n\n");
 		}
 		else if(msgType == ListFilesReq){
@@ -368,6 +392,8 @@ void *HandleTCPClient(void *clientInfo){
 			
 				totalBytesSent += bytesSent;
 			}
+			sprintf(logBuffer, "Sent list of files on server to main port of client. Client IP:%s, Client Main Port:%hu\n%s", clntIP, clntMainPort, fileBuffer);
+			writeLog(logBuffer);
 
 			printf("Sent list of files on directory to client:");
 			printf(" %s", fileBuffer);
@@ -385,6 +411,16 @@ void *HandleTCPClient(void *clientInfo){
 	}
 	close(clntChatSocket);
 	close(clntSocket);
+}
+
+void writeLog(char contents[]){
+	FILE* file = fopen("log.txt", "a");
+	if(file != NULL){
+		fprintf(file, "%s\n", contents);
+		fclose(file);
+	} else{
+		DieWithError("Error opening log file");
+	}
 }
 
 /* function to get size of file */
