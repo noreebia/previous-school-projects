@@ -323,9 +323,7 @@ int main(int argc, char *argv[]){
 	}
 	shouldRun = 0;
 	int threadDestruction = pthread_join(threadID, NULL);
-	if(threadDestruction == 0){
-		printf("Thread joined successfully.\n");
-	} else{
+	if(threadDestruction != 0){
 		DieWithError("Thread join failed\n");
 	}
 	printf("Exiting program.\n");
@@ -344,7 +342,6 @@ void *listenToSocket(void *chatSocket){
 		chatBuffer[STRINGBUFSIZE] = '\0';
     	printf("msg<- %s\n", chatBuffer);	
 	}
-	printf("Exiting thread\n");
 }
 
 /* function that returns size of file */

@@ -8,7 +8,7 @@
 
 #define MAXPENDING 5
 
-#define NUMOFCHATSOCKETS 2
+#define NUMOFCHATSOCKETS 10
 #define BUFSIZE 32
 #define FILEBUFSIZE 1024
 
@@ -397,7 +397,6 @@ void *HandleTCPClient(void *clientInfo){
 		}
 	}
 	connectedClientCount--;
-	printf("Closing Sockets.\n");
 	close(clntChatSocket);
 	close(clntFTPSocket);
 }

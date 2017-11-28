@@ -1,43 +1,64 @@
-New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41894, Client Chat Port : 55394
-Client has sent chat message 'hey' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
-Client has sent chat message 'l' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
-Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
+Client has sent chat message 'helloguys' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41918, Client Chat Port : 55418
+Client has sent chat message 'hi' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Client has sent chat message 'hihihi' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41922, Client Chat Port : 55422
+Client has sent chat message '1080' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'heeheehee' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'yoyoyo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Client has sent chat message 'yalyalyalyal' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Client has sent chat message 'hehehedisruption' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
 total 44
 -rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
--rw-r--r-- 1 noreebia noreebia 13940 11월 29 01:09 FtServer.c
--rw-r--r-- 1 noreebia noreebia   391 11월 29 01:10 log.txt
--rwxr-xr-x 1 noreebia noreebia 18248 11월 29 01:10 Server
+-rw-r--r-- 1 noreebia noreebia 14085 11월 29 01:25 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  1414 11월 29 01:27 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18248 11월 29 01:26 Server
 
-Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
-Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
-New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41898, Client Chat Port : 55398
-Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Client has sent chat message 'what'supbro' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Client has sent chat message 'hahahaha' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Client has sent chat message 'ahahahahahah' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Client has sent chat message 'ahahahahahahahahahah' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
-Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'yalyalyal' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Client has sent chat message 'yolyolyolyol' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Client has sent chat message 'yulyulyul' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Client has sent chat message 'r' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Client has sent chat message 'l' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
 total 56
 -rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
--rw-r--r-- 1 noreebia noreebia 10063 11월 29 01:11 FtClient.c
--rw-r--r-- 1 noreebia noreebia 13940 11월 29 01:09 FtServer.c
--rw-r--r-- 1 noreebia noreebia  2019 11월 29 01:16 log.txt
--rwxr-xr-x 1 noreebia noreebia 18248 11월 29 01:10 Server
+-rw-r--r-- 1 noreebia noreebia 10065 11월 29 01:29 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 14085 11월 29 01:25 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  2776 11월 29 01:30 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18248 11월 29 01:26 Server
 
-Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Client has sent chat message 'yumski' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Client has sent chat message 'yumskiyumski' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
 total 56
 -rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
--rw-r--r-- 1 noreebia noreebia 10063 11월 29 01:11 FtClient.c
--rw-r--r-- 1 noreebia noreebia 13940 11월 29 01:09 FtServer.c
--rw-r--r-- 1 noreebia noreebia  2460 11월 29 01:17 log.txt
--rwxr-xr-x 1 noreebia noreebia 18248 11월 29 01:10 Server
+-rw-r--r-- 1 noreebia noreebia 10065 11월 29 01:30 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 14085 11월 29 01:25 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  3755 11월 29 01:31 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18248 11월 29 01:26 Server
 
-Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41898, Client Chat Port:55398
-New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41906, Client Chat Port : 55406
-Client has sent chat message 'hehehehehe' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41906, Client Chat Port:55406
-Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41906, Client Chat Port:55406
-Client has sent chat message 'yamski' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
-Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41894, Client Chat Port:55394
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41914, Client Chat Port:55414
+Client has sent chat message 'yiyamyam' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Client has sent chat message 'heehee?' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'heehee?' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'heehee?' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'hawhaw?' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has sent chat message 'hawhaw!!' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
+Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41926, Client Chat Port : 55426
+Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41926, Client Chat Port:55426
+Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41926, Client Chat Port:55426
+Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41926, Client Chat Port:55426
+Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41926, Client Chat Port:55426
+Client has sent chat message 'yoguys'' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41926, Client Chat Port:55426
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41926, Client Chat Port:55426
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41922, Client Chat Port:55422
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41918, Client Chat Port:55418
