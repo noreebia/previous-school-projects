@@ -16,7 +16,6 @@
 #define ListFilesReq 'r'
 #define FILEACK 'a'
 #define ChatReq 'c'
-#define ChatRep 'h'
 #define Exit 'q'
 
 void DieWithError(char *errorMessage);
@@ -39,7 +38,6 @@ int main(int argc, char *argv[]){
 	int bytesToWrite;
 	int bytesRcvd, totalBytesRcvd;
 	int bytesSent, totalBytesSent;
-	char *echoString;
 	char stringBuffer[STRINGBUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
 	char fileName[256];
@@ -314,7 +312,7 @@ int main(int argc, char *argv[]){
 				printf("Files on FT server: %s\n", fileBuffer);
 			}
 			else if(operation == 'e'){
-				/* switch to echo chat mode */
+				/* switch to chat mode */
 				mode = 1;
 			}
 			else{

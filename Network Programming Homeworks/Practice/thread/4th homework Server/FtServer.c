@@ -19,7 +19,6 @@
 #define ListFilesReq 'r'
 #define FILEACK 'a'
 #define ChatReq 'c'
-#define ChatRep 'h'
 #define Exit 'q'
 
 void DieWithError(char *errorMessage);
@@ -382,13 +381,13 @@ void *HandleTCPClient(void *clientInfo){
 			sprintf(logBuffer, "Sent list of files on server to FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n%s", clntIP, clntFTPPort, clntChatPort, fileBuffer);
 			writeLog(logBuffer);
 
-			printf("Sent list of files on directory to client:");
-			printf(" %s", fileBuffer);
+			printf("Sent list of files on server to FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n", clntIP, clntFTPPort, clntChatPort);
+			printf("%s", fileBuffer);
 
 			printf("Waiting for operation from client...\n\n");
 		}
 	}
-	sprintf(logBuffer, "Client has disconnected. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n", clntIP, clntFTPPort, clntChatPort);
+	sprintf(logBuffer, "Client has disconnected. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", clntIP, clntFTPPort, clntChatPort);
 	writeLog(logBuffer);
 	printf("%s\n",logBuffer);
 	for(int i=0; i<NUMOFCHATSOCKETS;i++){
