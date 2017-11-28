@@ -8,8 +8,7 @@
 
 #define MAXPENDING 5
 
-#define NUMOFCHATSOCKETS 10
-
+#define NUMOFCHATSOCKETS 2
 #define BUFSIZE 32
 #define FILEBUFSIZE 1024
 
@@ -19,8 +18,8 @@
 #define FileDownloadReady 'y'
 #define ListFilesReq 'r'
 #define FILEACK 'a'
-#define EchoReq 'c'
-#define EchoRep 'h'
+#define ChatReq 'c'
+#define ChatRep 'h'
 #define Exit 'q'
 
 void DieWithError(char *errorMessage);
@@ -81,7 +80,6 @@ int main(int argc, char *argv[])
 	if (setsockopt(serverChatSocket, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
 	    DieWithError("setsockopt(SO_REUSEADDR) failed");
 
-
 	memset(&serverChatAddress, 0, sizeof(serverChatAddress));
 	serverChatAddress.sin_family = AF_INET;
 	serverChatAddress.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -92,7 +90,6 @@ int main(int argc, char *argv[])
 
 	if(listen(serverChatSocket, MAXPENDING) < 0)
 		DieWithError("listen() failed");
-
 
 	while(1){
 		printf("Listening for clients...\n");
@@ -108,31 +105,35 @@ int main(int argc, char *argv[])
 			DieWithError("accept() failed");
 
 
-		chatSockets[connectionCount] = clientChatSocket;
-		connectionCount++;
+		if(connectionCount >= (NUMOFCHATSOCKETS)){
+			if(send(clientFTPSocket, "overcapacity", strlen("overcapacity"), 0) != strlen("overcapacity"))
+				DieWithError("send() failed");
+		}else{
+			chatSockets[connectionCount] = clientChatSocket;
+			connectionCount++;
 
-		struct ClientInfo *newClientInfo = (struct ClientInfo*) malloc(sizeof(struct ClientInfo));
+			struct ClientInfo *newClientInfo = (struct ClientInfo*) malloc(sizeof(struct ClientInfo));
 
-		if(newClientInfo == NULL){
-			DieWithError("ClientInfo struct creation failed");
+			if(newClientInfo == NULL){
+				DieWithError("ClientInfo struct creation failed");
+			}
+
+			strcpy(newClientInfo->ip, inet_ntoa(clientFTPAddress.sin_addr));
+			newClientInfo->clientFTPPort = ntohs(clientFTPAddress.sin_port);
+			newClientInfo->clientChatPort = ntohs(clientChatAddress.sin_port);
+			newClientInfo->clientFTPSocket = clientFTPSocket;
+			newClientInfo->clientChatSocket = clientChatSocket;
+
+			pthread_t threadID;
+			int threadCreation = pthread_create(&threadID, NULL, HandleTCPClient, newClientInfo);
+			if(threadCreation){
+				DieWithError("error creating thread");
+			}
+			else{
+				printf("new thread created.");
+			}
+			printf("listening again...");
 		}
-
-		strcpy(newClientInfo->ip, inet_ntoa(clientFTPAddress.sin_addr));
-		newClientInfo->clientFTPPort = ntohs(clientFTPAddress.sin_port);
-		newClientInfo->clientChatPort = ntohs(clientChatAddress.sin_port);
-		newClientInfo->clientFTPSocket = clientFTPSocket;
-		newClientInfo->clientChatSocket = clientChatSocket;
-
-		pthread_t threadID;
-		int threadCreation = pthread_create(&threadID, NULL, HandleTCPClient, newClientInfo);
-		if(threadCreation){
-			DieWithError("error creating thread");
-		}
-		else{
-			printf("new thread created.");
-		}
-
-		printf("listening again...");
 	}	
 }
 
@@ -147,13 +148,13 @@ void *HandleTCPClient(void *clientInfo){
 	int bytesToWrite;
 	int totalBytesSent, bytesSent;
 	int bytesRcvd, totalBytesRcvd;
-	int echoStringLength;
+	int chatStringLength;
 	char fileSizeInString[20];
 	char fileName[256];
 	char stringBuffer[BUFSIZE];
 	char fileBuffer[FILEBUFSIZE];
 	char msgType=0;
-	char echoStringLengthInString[20];
+	char chatStringLengthInString[20];
 	char logBuffer[1024];
 	FILE *fp;
 
@@ -189,7 +190,7 @@ void *HandleTCPClient(void *clientInfo){
 		memset(fileName, 0, 256);
 		memset(fileBuffer, 0, FILEBUFSIZE);
 		memset(stringBuffer, 0, BUFSIZE);
-		memset(echoStringLengthInString, 0, 20);
+		memset(chatStringLengthInString, 0, 20);
 		memset(logBuffer, 0, 1024);
 		
 		/* receive msgType from client */
@@ -197,16 +198,16 @@ void *HandleTCPClient(void *clientInfo){
 			DieWithError("recv() failed");
 		}
 
-		if(msgType == EchoReq){
+		if(msgType == ChatReq){
 			totalBytesRcvd = 0;
 
-			if((bytesRcvd = recv(clntFTPSocket, echoStringLengthInString, 20, 0)) <0)
+			if((bytesRcvd = recv(clntFTPSocket, chatStringLengthInString, 20, 0)) <0)
 				DieWithError("recv() failed");	
 			
-			echoStringLength = atoi(echoStringLengthInString);
-			if(echoStringLength > BUFSIZE){	/* if string length exceeds buffer length */
+			chatStringLength = atoi(chatStringLengthInString);
+			if(chatStringLength > BUFSIZE){	/* if string length exceeds buffer length */
 				totalBytesRcvd = 0;				
-				while(totalBytesRcvd < echoStringLength){
+				while(totalBytesRcvd < chatStringLength){
 					if((bytesRcvd = recv(clntFTPSocket, stringBuffer, BUFSIZE-1, 0)) <0)
 						DieWithError("recv() failed");	
 

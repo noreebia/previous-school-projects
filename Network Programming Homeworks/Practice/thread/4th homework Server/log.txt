@@ -150,3 +150,112 @@ total 52
 -rwxr-xr-x 1 noreebia noreebia 18240 11월 28 22:23 Server
 
 Sent file 'log.txt' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41812, Client Chat Port:55312
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41812, Client Chat Port:55312
+total 52
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13426 11월 28 22:23 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 10133 11월 28 22:25 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 22:23 Server
+
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41812, Client Chat Port:55312
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41812, Client Chat Port:55312
+total 64
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 10010 11월 28 22:32 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 13426 11월 28 22:23 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 10630 11월 28 22:32 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 22:23 Server
+
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41816, Client Chat Port:55316
+total 64
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 10010 11월 28 22:32 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 13426 11월 28 22:23 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 11071 11월 28 22:32 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 22:23 Server
+
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41816, Client Chat Port:55316
+
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41812, Client Chat Port:55312
+
+New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41830, Client Chat Port : 55330
+New client has connected. Client IP : 127.0.0.1, Client FTP Port : 41834, Client Chat Port : 55334
+Client has sent chat message 'hello' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Client has sent chat message 'heeheehee' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'what'sup' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'what'supbro' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 12651 11월 28 23:48 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Client has sent chat message 'r' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 13174 11월 28 23:48 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 13665 11월 28 23:49 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 14043 11월 28 23:49 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Sent file 'FtServer.c' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+total 68
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 10107 11월 28 23:49 FtClient.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 14653 11월 28 23:49 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 15094 11월 28 23:50 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Received file 'FtClient.c' from FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 15591 11월 28 23:50 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Sent list of files on server to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+total 56
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13632 11월 28 23:46 FtServer.c
+-rw-r--r-- 1 noreebia noreebia 15969 11월 28 23:50 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 23:46 Server
+
+Client has sent chat message 'yo' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'hmm?' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'fda' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Client has sent chat message 'asdflala' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'lalaasdf' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Client has sent chat message 'yam' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+Client has sent chat message 'lalalsdflalal' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Client has sent chat message 'haha' from chat port. Delivering to other clients. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41830, Client Chat Port:55330
+
+Client has disconnected. Client IP:127.0.0.1, Client FTP Port:41834, Client Chat Port:55334
+

@@ -15,8 +15,8 @@
 #define FileDownloadReady 'y'
 #define ListFilesReq 'r'
 #define FILEACK 'a'
-#define EchoReq 'c'
-#define EchoRep 'h'
+#define ChatReq 'c'
+#define ChatRep 'h'
 #define Exit 'q'
 
 void DieWithError(char *errorMessage);
@@ -25,7 +25,7 @@ int fSize(char* file);
 
 int shouldRun = 1;
 int main(int argc, char *argv[]){
-	unsigned short serverMainPort = 1080;
+	unsigned short serverFTPPort = 1080;
 	unsigned short serverChatPort = 1081;
 	char servIP[20];
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in chatServAddr;
 
 	unsigned int echoStringLen;
-	int sock;
+	int ftpSock;
 	int chatSock;
 	int fileSize;
 	int bytesToWrite;
@@ -53,22 +53,19 @@ int main(int argc, char *argv[]){
 	FILE *fp;
 
 	/* receive ip server */
-	printf("Server ip : ");
+	printf("Server IP : ");
 	scanf("%s", servIP);
-	/* receive port of server */
-	//printf("Port : ");
-	//scanf("%hu", &serverPort);
 
-	//main socket
-	if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+	//ftp socket
+	if((ftpSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		DieWithError("socket() failed");
 
 	memset(&echoServAddr, 0, sizeof(echoServAddr));
 	echoServAddr.sin_family = AF_INET;
 	echoServAddr.sin_addr.s_addr = inet_addr(servIP);
-	echoServAddr.sin_port = htons(serverMainPort);
+	echoServAddr.sin_port = htons(serverFTPPort);
 
-	if(connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))<0)
+	if(connect(ftpSock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))<0)
 		DieWithError("connect() failed");
 
 	//chat socket
@@ -85,15 +82,22 @@ int main(int argc, char *argv[]){
 
 	/* send "hello "*/
 	strcpy(stringBuffer, "hello");
-	if(send(sock, stringBuffer, STRINGBUFSIZE, 0) != STRINGBUFSIZE)
+	if(send(ftpSock, stringBuffer, STRINGBUFSIZE, 0) != STRINGBUFSIZE)
 		DieWithError("send() sent a different number of bytes than expected");
 
 	printf("Msg> %s\n", stringBuffer);	
 
 	/* receive "hi" */
 	memset(stringBuffer, 0, STRINGBUFSIZE);
-	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE, 0)) <0){
+	if((bytesRcvd = recv(ftpSock, stringBuffer, STRINGBUFSIZE, 0)) <0){
 		DieWithError("recv() failed");
+	}
+
+	if(!strcmp(stringBuffer, "overcapacity")){
+		printf("Server is busy.\n");
+		close(ftpSock);
+		close(chatSock);
+		exit(0);
 	}
 
 	printf("Msg< %s\n\n", stringBuffer);	
@@ -103,17 +107,17 @@ int main(int argc, char *argv[]){
 	int threadCreation = pthread_create(&threadID, NULL, listenToSocket, (void *)chatSock);
 
 	while(1){
-		/* echo string mode */
+		/* chat mode */
 		if(mode == 1){
 			printf("Msg> ");
-			/* receive string to echo */
+			/* receive string to send to server */
 			scanf(" %s", stringBuffer);
 
 			/* if "quit" is input, exit program*/
 			if(strcmp(stringBuffer, "/quit") == 0){
 				/* send message to server that this program will disconnect*/
 				msgType = Exit;
-				if(send(sock, &msgType, 1, 0) != 1)
+				if(send(ftpSock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 				break;
 			}
@@ -122,21 +126,21 @@ int main(int argc, char *argv[]){
 				mode = 2;
 				printf("Welcome to Socket FT client!\n");
 			}
-			/* send and receive echo string */
+			/* send string */
 			else{
 				/* send msgType */
-				msgType = EchoReq;
-				if(send(sock, &msgType, 1, 0) != 1)
+				msgType = ChatReq;
+				if(send(ftpSock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 
 				stringLength = strlen(stringBuffer);
 				sprintf(stringLengthInString, "%d", stringLength);
 
-				if( send(sock, stringLengthInString, 20,0) != 20){	
+				if( send(ftpSock, stringLengthInString, 20,0) != 20){	
 					DieWithError("recv() failed or connection closed prematurely");
 				}			
 
-				if( send(sock, stringBuffer, stringLength,0) != stringLength){	
+				if( send(ftpSock, stringBuffer, stringLength,0) != stringLength){	
 					DieWithError("recv() failed or connection closed prematurely");
 				}
 			}
@@ -175,28 +179,28 @@ int main(int argc, char *argv[]){
 				}
 
 				/* send msgtype */
-				if(send(sock, &msgType, 1, 0) != 1)
+				if(send(ftpSock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 				
 				/* send file name to upload*/
-				if(send(sock, fileName, 256, 0) != 256)
+				if(send(ftpSock, fileName, 256, 0) != 256)
 					DieWithError("send() sent a different number of bytes than expected");
 
 				/* send file size */
-				if(send(sock, fileSizeInString, 20, 0) != 20)
+				if(send(ftpSock, fileSizeInString, 20, 0) != 20)
 					DieWithError("send() sent a different number of bytes than expected");
 
 				printf("Sent file size to server: %s\n", fileSizeInString);
 
 				/* receive ACK */
-				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
+				if((bytesRcvd = recv(ftpSock, &msgType, 1, 0)) <0){
 					DieWithError("recv() failed");
 				}
 		
 				/* send file contents */
 				printf("Sending => ");
 				while( fread(fileBuffer, 1, FILEBUFSIZE, fp) > 0){
-					if((bytesSent = send(sock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+					if((bytesSent = send(ftpSock, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 						DieWithError("send() sent a different number of bytes than expected");
 			
 					printf("#");
@@ -215,14 +219,14 @@ int main(int argc, char *argv[]){
 				printf("Name of file to get from server:");
 				scanf("%s", fileName);
 
-				if(send(sock, &msgType, 1, 0) != 1)
+				if(send(ftpSock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 				
 				/* send name of file to download */
-				if(send(sock, fileName, 256, 0) != 256)
+				if(send(ftpSock, fileName, 256, 0) != 256)
 					DieWithError("send() sent a different number of bytes than expected");
 
-				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0)
+				if((bytesRcvd = recv(ftpSock, &msgType, 1, 0)) <0)
 					DieWithError("recv() failed");	
 
 				/* if file does not exist on server, display error message and try again */
@@ -235,7 +239,7 @@ int main(int argc, char *argv[]){
 				memset(fileSizeInString, 0, 20);
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < 20){
-					if((bytesRcvd = recv(sock, fileSizeInString, 20, 0)) <= 0)
+					if((bytesRcvd = recv(ftpSock, fileSizeInString, 20, 0)) <= 0)
 						DieWithError("recv failed or connection closed prematurely");	
 
 					totalBytesRcvd += bytesRcvd;
@@ -251,7 +255,7 @@ int main(int argc, char *argv[]){
 
 				/* send ACK */
 				msgType = FILEACK;
-				if(send(sock, &msgType, 1, 0) != 1)
+				if(send(ftpSock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 
 				/* receive file contents */
@@ -265,7 +269,7 @@ int main(int argc, char *argv[]){
 						bytesToWrite = FILEBUFSIZE;
 					}
 
-					if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) < 0)
+					if((bytesRcvd = recv(ftpSock, fileBuffer, FILEBUFSIZE, 0)) < 0)
 						DieWithError("recv failed or connection closed prematurely");	
 					
 					printf("#");
@@ -295,13 +299,13 @@ int main(int argc, char *argv[]){
 			else if(operation == 'r'){
 				//send msgtype
 				msgType = ListFilesReq;
-				if(send(sock, &msgType, 1, 0) != 1)
+				if(send(ftpSock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 	
 	
 				totalBytesRcvd = 0;
 				while(totalBytesRcvd < FILEBUFSIZE){
-					if((bytesRcvd = recv(sock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
+					if((bytesRcvd = recv(ftpSock, fileBuffer, FILEBUFSIZE, 0)) <= 0)
 						DieWithError("recv failed or connection closed prematurely");	
 					
 					totalBytesRcvd += bytesRcvd;
@@ -327,7 +331,7 @@ int main(int argc, char *argv[]){
 		DieWithError("Thread join failed\n");
 	}
 	printf("Exiting program.\n");
-	close(sock);
+	close(ftpSock);
 	close(chatSock);
 	exit(0);
 }
