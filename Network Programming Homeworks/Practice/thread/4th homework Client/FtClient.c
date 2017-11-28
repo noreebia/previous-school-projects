@@ -139,28 +139,6 @@ int main(int argc, char *argv[]){
 				if( send(sock, stringBuffer, stringLength,0) != stringLength){	
 					DieWithError("recv() failed or connection closed prematurely");
 				}
-				
-				/*
-				if((bytesRcvd = recv(sock, &msgType, 1, 0)) <0){
-					DieWithError("recv() failed");
-				}
-				*/
-
-				/* receive echoed string from server */
-				/*
-				memset(stringBuffer, 0, STRINGBUFSIZE);
-				totalBytesRcvd = 0;
-				while(totalBytesRcvd < stringLength){
-   	 	   		 	if((bytesRcvd = recv(sock, stringBuffer, STRINGBUFSIZE-1, 0)) <= 0){
-						DieWithError("recv failed or connection closed prematurely");
-					}			
-   		    	 	totalBytesRcvd += bytesRcvd;
-					stringBuffer[bytesRcvd] = '\0';
-	       			printf("Msg< %s\n\n", stringBuffer);
-					memset(stringBuffer, 0, STRINGBUFSIZE);
-				}
-				*/
-				//memset(stringBuffer, 0, STRINGBUFSIZE);
 			}
 		}
 		/* file transfer mode */

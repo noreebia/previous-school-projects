@@ -30,9 +30,9 @@ int fSize(char* file);
 
 struct ClientInfo{
 	char ip[20];
-	unsigned short clientMainPort;
+	unsigned short clientFTPPort;
 	unsigned short clientChatPort;
-	int clientMainSocket;
+	int clientFTPSocket;
 	int clientChatSocket;
 };
 
@@ -41,12 +41,12 @@ int connectionCount = 0;
 
 int main(int argc, char *argv[])
 {
-	int serverMainSocket;
-	int clientMainSocket;
-	struct sockaddr_in serverMainAddress;
-	struct sockaddr_in clientMainAddress;
+	int serverFTPSocket;
+	int clientFTPSocket;
+	struct sockaddr_in serverFTPAddress;
+	struct sockaddr_in clientFTPAddress;
 	unsigned short mainServerPort = 1080;
-	unsigned int clientMainLength;
+	unsigned int clientFTPLength;
 
 	int serverChatSocket;
 	int clientChatSocket;
@@ -54,29 +54,24 @@ int main(int argc, char *argv[])
 	struct sockaddr_in clientChatAddress;
 	unsigned short chatServPort = 1081;
 	unsigned int clientChatLength;
-	/*
-	if(argc != 2){
-		fprintf(stderr, "Usage: %s <Server Port>\n", argv[0]);
-		exit(1);
-	}
-	*/
 
-	if((serverMainSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+
+	if((serverFTPSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		DieWithError("socket() failed");
 
-	if (setsockopt(serverMainSocket, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
+	if (setsockopt(serverFTPSocket, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
 	    DieWithError("setsockopt(SO_REUSEADDR) failed");
 
 
-	memset(&serverMainAddress, 0, sizeof(serverMainAddress));
-	serverMainAddress.sin_family = AF_INET;
-	serverMainAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-	serverMainAddress.sin_port = htons(mainServerPort);
+	memset(&serverFTPAddress, 0, sizeof(serverFTPAddress));
+	serverFTPAddress.sin_family = AF_INET;
+	serverFTPAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	serverFTPAddress.sin_port = htons(mainServerPort);
 
-	if(bind(serverMainSocket, (struct sockaddr *) &serverMainAddress, sizeof(serverMainAddress)) < 0)
+	if(bind(serverFTPSocket, (struct sockaddr *) &serverFTPAddress, sizeof(serverFTPAddress)) < 0)
 		DieWithError("bind() failed");
 
-	if(listen(serverMainSocket, MAXPENDING) < 0)
+	if(listen(serverFTPSocket, MAXPENDING) < 0)
 		DieWithError("listen() failed");
 
 	//chat socket
@@ -102,9 +97,9 @@ int main(int argc, char *argv[])
 	while(1){
 		printf("Listening for clients...\n");
 
-		clientMainLength = sizeof(clientMainAddress);
+		clientFTPLength = sizeof(clientFTPAddress);
 	
-		if((clientMainSocket = accept(serverMainSocket, (struct sockaddr *) &clientMainAddress, &clientMainLength)) < 0)
+		if((clientFTPSocket = accept(serverFTPSocket, (struct sockaddr *) &clientFTPAddress, &clientFTPLength)) < 0)
 			DieWithError("accept() failed");
 
 		clientChatLength = sizeof(clientChatAddress);
@@ -122,14 +117,13 @@ int main(int argc, char *argv[])
 			DieWithError("ClientInfo struct creation failed");
 		}
 
-		strcpy(newClientInfo->ip, inet_ntoa(clientMainAddress.sin_addr));
-		newClientInfo->clientMainPort = ntohs(clientMainAddress.sin_port);
+		strcpy(newClientInfo->ip, inet_ntoa(clientFTPAddress.sin_addr));
+		newClientInfo->clientFTPPort = ntohs(clientFTPAddress.sin_port);
 		newClientInfo->clientChatPort = ntohs(clientChatAddress.sin_port);
-		newClientInfo->clientMainSocket = clientMainSocket;
+		newClientInfo->clientFTPSocket = clientFTPSocket;
 		newClientInfo->clientChatSocket = clientChatSocket;
 
 		pthread_t threadID;
-		//int newConnectionSocket = clientMainSocket;
 		int threadCreation = pthread_create(&threadID, NULL, HandleTCPClient, newClientInfo);
 		if(threadCreation){
 			DieWithError("error creating thread");
@@ -139,15 +133,14 @@ int main(int argc, char *argv[])
 		}
 
 		printf("listening again...");
-		//HandleTCPClient(clntSock);
 	}	
 }
 
 void *HandleTCPClient(void *clientInfo){
 	char clntIP[20];
-	unsigned short clntMainPort = ((struct ClientInfo*)clientInfo) -> clientMainPort;
+	unsigned short clntFTPPort = ((struct ClientInfo*)clientInfo) -> clientFTPPort;
 	unsigned short clntChatPort = ((struct ClientInfo*)clientInfo) -> clientChatPort;
-	int clntSocket = ((struct ClientInfo*)clientInfo) -> clientMainSocket;
+	int clntFTPSocket = ((struct ClientInfo*)clientInfo) -> clientFTPSocket;
 	int clntChatSocket = ((struct ClientInfo*)clientInfo) -> clientChatSocket;
 
 	int fileSize;
@@ -168,15 +161,15 @@ void *HandleTCPClient(void *clientInfo){
 
 	printf("New client has connected.\n");
 	printf("Client IP : %s\n", clntIP);
-	printf("Client Main Port : %d\n", clntMainPort);
+	printf("Client FTP Port : %d\n", clntFTPPort);
 	printf("Client Chat Port : %d\n", clntChatPort);
 
-	sprintf(logBuffer, "New client has connected. Client IP : %s, Client Main Port : %d, Client Chat Port : %d", clntIP, clntMainPort, clntChatPort);
+	sprintf(logBuffer, "New client has connected. Client IP : %s, Client FTP Port : %d, Client Chat Port : %d", clntIP, clntFTPPort, clntChatPort);
 	writeLog(logBuffer);
 
 	/* receive "hello" */
 	memset(stringBuffer, 0, BUFSIZE);
-	if(recv(clntSocket, stringBuffer, BUFSIZE, 0) <0){
+	if(recv(clntFTPSocket, stringBuffer, BUFSIZE, 0) <0){
 		DieWithError("recv() failed");
 	}
 
@@ -185,7 +178,7 @@ void *HandleTCPClient(void *clientInfo){
 	/* send "hi" */
 	memset(stringBuffer, 0, BUFSIZE);
 	strcpy(stringBuffer, "hi");
-	if(send(clntSocket, stringBuffer, BUFSIZE, 0) != BUFSIZE)
+	if(send(clntFTPSocket, stringBuffer, BUFSIZE, 0) != BUFSIZE)
 		DieWithError("send() sent a different number of bytes than expected");
 	
 	printf("Msg> %s\n\n", stringBuffer);
@@ -200,21 +193,21 @@ void *HandleTCPClient(void *clientInfo){
 		memset(logBuffer, 0, 1024);
 		
 		/* receive msgType from client */
-		if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <=0){
+		if((bytesRcvd = recv(clntFTPSocket, &msgType, 1, 0)) <=0){
 			DieWithError("recv() failed");
 		}
 
 		if(msgType == EchoReq){
 			totalBytesRcvd = 0;
 
-			if((bytesRcvd = recv(clntSocket, echoStringLengthInString, 20, 0)) <0)
+			if((bytesRcvd = recv(clntFTPSocket, echoStringLengthInString, 20, 0)) <0)
 				DieWithError("recv() failed");	
 			
 			echoStringLength = atoi(echoStringLengthInString);
 			if(echoStringLength > BUFSIZE){	/* if string length exceeds buffer length */
 				totalBytesRcvd = 0;				
 				while(totalBytesRcvd < echoStringLength){
-					if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE-1, 0)) <0)
+					if((bytesRcvd = recv(clntFTPSocket, stringBuffer, BUFSIZE-1, 0)) <0)
 						DieWithError("recv() failed");	
 
 					for(int i=0;i<NUMOFCHATSOCKETS;i++){
@@ -225,14 +218,14 @@ void *HandleTCPClient(void *clientInfo){
 						}
 					}
 					totalBytesRcvd += bytesRcvd;
-					sprintf(logBuffer, "Client has sent chat message '%s'. Delivering to other clients. Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
+					sprintf(logBuffer, "Client has sent chat message '%s' from chat port. Delivering to other clients. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", stringBuffer, clntIP, clntFTPPort, clntChatPort);
 					writeLog(logBuffer);
 					printf("%s\n",logBuffer);
 					memset(stringBuffer, 0, BUFSIZE);
 				}
 			}
 			else{	/* if string length does not exceed buffer length */
-				if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE, 0)) <0)
+				if((bytesRcvd = recv(clntFTPSocket, stringBuffer, BUFSIZE, 0)) <0)
 					DieWithError("recv() failed");	
 
 				for(int i=0;i<NUMOFCHATSOCKETS;i++){
@@ -242,7 +235,7 @@ void *HandleTCPClient(void *clientInfo){
 						}				
 					}
 				}
-				sprintf(logBuffer, "Client has sent chat message '%s'. Delivering to other clients. Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
+				sprintf(logBuffer, "Client has sent chat message '%s' from chat port. Delivering to other clients. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", stringBuffer, clntIP, clntFTPPort, clntChatPort);
 				writeLog(logBuffer);
 				printf("%s\n",logBuffer);
 			}
@@ -250,14 +243,14 @@ void *HandleTCPClient(void *clientInfo){
 		
 		else if(msgType == FileUploadReq){
 			/* receive name of file clients wants to upload */
-			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
+			if((bytesRcvd = recv(clntFTPSocket, fileName, 256, 0)) <0)
 				DieWithError("recv() failed");	
 
 			printf("File name client will upload: %s\n", fileName);
 
 
 			/* receive size of file */ 
-			if((bytesRcvd = recv(clntSocket, fileSizeInString, 20, 0)) <0)
+			if((bytesRcvd = recv(clntFTPSocket, fileSizeInString, 20, 0)) <0)
 			{
 				DieWithError("recv() failed");
 			}
@@ -266,7 +259,7 @@ void *HandleTCPClient(void *clientInfo){
 
 			/* send ACK */
 			msgType = FILEACK;
-			if(send(clntSocket, &msgType, 1, 0) != 1)
+			if(send(clntFTPSocket, &msgType, 1, 0) != 1)
 				DieWithError("send() sent a different number of bytes than expected");
 
 			//open file
@@ -287,7 +280,7 @@ void *HandleTCPClient(void *clientInfo){
 				else{	/* if number of bytes left to receive is bigger than file buffer, receive whole buffer size */
 					bytesToWrite = FILEBUFSIZE;
 				}
-				if((bytesRcvd = recv(clntSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
+				if((bytesRcvd = recv(clntFTPSocket, fileBuffer, FILEBUFSIZE, 0)) <0)
 					DieWithError("recv() failed");	
 				
 				printf("#");
@@ -299,7 +292,7 @@ void *HandleTCPClient(void *clientInfo){
 			printf("\n");		
 			printf("%s (%d bytes) successfully received from client\n", fileName, fileSize);
 
-			sprintf(logBuffer, "Received file '%s' from main port of client. Client IP: %s, Client Main Port: %hu", fileName, clntIP, clntMainPort);
+			sprintf(logBuffer, "Received file '%s' from FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", fileName, clntIP, clntFTPPort, clntChatPort);
 			writeLog(logBuffer);
 
 			printf("Waiting for operation from client...\n\n");
@@ -307,7 +300,7 @@ void *HandleTCPClient(void *clientInfo){
 		else if(msgType == FileDownloadReq){
 
 			/* receive name of file client wants to download */
-			if((bytesRcvd = recv(clntSocket, fileName, 256, 0)) <0)
+			if((bytesRcvd = recv(clntFTPSocket, fileName, 256, 0)) <0)
 				DieWithError("recv() failed");	
 
 			printf("Received name of file client wants to download: %s\n", fileName);			
@@ -321,31 +314,31 @@ void *HandleTCPClient(void *clientInfo){
 				printf("File does not exist. Sending error message to client.\n");
 				printf("Waiting for operation from client...\n\n");
 				msgType = FileDownloadError;
-				if(send(clntSocket, &msgType, 1, 0) != 1)
+				if(send(clntFTPSocket, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 				continue;
 			}
 			else{
 				msgType = FileDownloadReady;
-				if(send(clntSocket, &msgType, 1, 0) != 1)
+				if(send(clntFTPSocket, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
 			}
 
 			/* send size of file client wants to download */
-			if(send(clntSocket, fileSizeInString, 20, 0) != 20)
+			if(send(clntFTPSocket, fileSizeInString, 20, 0) != 20)
 				DieWithError("send() sent a different number of bytes than expected");
 
 			printf("Sent size of file to client: %s\n", fileSizeInString);
 
 			/* receive ACK from client */
-			if((bytesRcvd = recv(clntSocket, &msgType, 1, 0)) <0){
+			if((bytesRcvd = recv(clntFTPSocket, &msgType, 1, 0)) <0){
 				DieWithError("recv() failed");
 			}
 
 			/* send file contents */
 			printf("Sending => ");
 			while( (fread(fileBuffer, 1, FILEBUFSIZE, fp)) > 0){
-				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+				if((bytesSent = send(clntFTPSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
 			
 				printf("#");
@@ -356,7 +349,7 @@ void *HandleTCPClient(void *clientInfo){
 			printf("\n");
 			printf("%s (%d bytes) successfully sent to client\n", fileName, fileSize);
 
-			sprintf(logBuffer, "Sent file '%s' to main port of client. Client IP:%s, Client Main Port:%hu", fileName, clntIP, clntMainPort);
+			sprintf(logBuffer, "Sent file '%s' to FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", fileName, clntIP, clntFTPPort, clntChatPort);
 			writeLog(logBuffer);
 
 			printf("Waiting for operation from client...\n\n");
@@ -373,12 +366,12 @@ void *HandleTCPClient(void *clientInfo){
 			/* sent list of directory to client */
 			totalBytesSent = 0;
 			while(totalBytesSent < FILEBUFSIZE){
-				if((bytesSent = send(clntSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
+				if((bytesSent = send(clntFTPSocket, fileBuffer, FILEBUFSIZE, 0)) != FILEBUFSIZE)
 					DieWithError("send() sent a different number of bytes than expected");
 			
 				totalBytesSent += bytesSent;
 			}
-			sprintf(logBuffer, "Sent list of files on server to main port of client. Client IP:%s, Client Main Port:%hu\n%s", clntIP, clntMainPort, fileBuffer);
+			sprintf(logBuffer, "Sent list of files on server to FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n%s", clntIP, clntFTPPort, clntChatPort, fileBuffer);
 			writeLog(logBuffer);
 
 			printf("Sent list of files on directory to client:");
@@ -387,7 +380,7 @@ void *HandleTCPClient(void *clientInfo){
 			printf("Waiting for operation from client...\n\n");
 		}
 	}
-	sprintf(logBuffer, "Client has disconnected. Client IP:%s, Client Main Port:%hu, Client Chat Port:%hu\n", clntIP, clntMainPort, clntChatPort);
+	sprintf(logBuffer, "Client has disconnected. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n", clntIP, clntFTPPort, clntChatPort);
 	writeLog(logBuffer);
 	printf("%s\n",logBuffer);
 	for(int i=0; i<NUMOFCHATSOCKETS;i++){
@@ -399,7 +392,7 @@ void *HandleTCPClient(void *clientInfo){
 	}
 	printf("Closing Socket.\n");
 	close(clntChatSocket);
-	close(clntSocket);
+	close(clntFTPSocket);
 }
 
 void writeLog(char contents[]){

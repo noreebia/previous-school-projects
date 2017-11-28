@@ -149,4 +149,3 @@ total 52
 -rw-r--r-- 1 noreebia noreebia  9645 11월 28 22:24 log.txt
 -rwxr-xr-x 1 noreebia noreebia 18240 11월 28 22:23 Server
 
-Sent file 'log.txt' to FTP port of client. Client IP:127.0.0.1, Client FTP Port:41812, Client Chat Port:55312
