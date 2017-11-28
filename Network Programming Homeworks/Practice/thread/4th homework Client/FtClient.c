@@ -344,7 +344,7 @@ void *listenToSocket(void *chatSocket){
 		chatBuffer[STRINGBUFSIZE] = '\0';
     	printf("msg<- %s\n", chatBuffer);	
 	}
-	printf("Exiting thread");
+	printf("Exiting thread\n");
 }
 
 /* function that returns size of file */

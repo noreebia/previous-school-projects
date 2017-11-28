@@ -297,7 +297,7 @@ void *HandleTCPClient(void *clientInfo){
 			}
 			fclose(fp);
 			printf("\n");		
-			printf("%s (%d bytes) successfully received from client\n", fileName, fileSize);
+			printf("%s (%d bytes) successfully received from client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n", fileName, fileSize, clntIP, clntFTPPort, clntChatPort);
 
 			sprintf(logBuffer, "Received file '%s' from FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", fileName, clntIP, clntFTPPort, clntChatPort);
 			writeLog(logBuffer);
@@ -354,7 +354,7 @@ void *HandleTCPClient(void *clientInfo){
 			}			
 			fclose(fp);
 			printf("\n");
-			printf("%s (%d bytes) successfully sent to client\n", fileName, fileSize);
+			printf("%s (%d bytes) successfully sent to client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu\n", fileName, fileSize, clntIP, clntFTPPort, clntChatPort);
 
 			sprintf(logBuffer, "Sent file '%s' to FTP port of client. Client IP:%s, Client FTP Port:%hu, Client Chat Port:%hu", fileName, clntIP, clntFTPPort, clntChatPort);
 			writeLog(logBuffer);
@@ -392,13 +392,12 @@ void *HandleTCPClient(void *clientInfo){
 	printf("%s\n",logBuffer);
 	for(int i=0; i<NUMOFCHATSOCKETS;i++){
 		if(chatSockets[i] == clntChatSocket){
-			printf("changed socket back to 0\n");
 			chatSockets[i] = 0;
 			break;
 		}
 	}
 	connectedClientCount--;
-	printf("Closing Socket.\n");
+	printf("Closing Sockets.\n");
 	close(clntChatSocket);
 	close(clntFTPSocket);
 }
