@@ -23,20 +23,18 @@ void DieWithError(char *errorMessage);
 void *listenToSocket(void *chatSocket);
 int fSize(char* file);
 
+int shouldRun = 1;
 int main(int argc, char *argv[]){
 	unsigned short serverMainPort = 1080;
 	unsigned short serverChatPort = 1081;
 	char servIP[20];
 
 	struct sockaddr_in echoServAddr;
-
 	struct sockaddr_in chatServAddr;
 
 	unsigned int echoStringLen;
 	int sock;
-
 	int chatSock;
-
 	int fileSize;
 	int bytesToWrite;
 	int bytesRcvd, totalBytesRcvd;
@@ -117,7 +115,6 @@ int main(int argc, char *argv[]){
 				msgType = Exit;
 				if(send(sock, &msgType, 1, 0) != 1)
 					DieWithError("send() sent a different number of bytes than expected");
-				
 				break;
 			}
 			/* if "FT" is input, switch to file transfer mode */
@@ -344,9 +341,16 @@ int main(int argc, char *argv[]){
 			}
 		}
 	}
-
+	shouldRun = 0;
+	int threadDestruction = pthread_join(threadID, NULL);
+	if(threadDestruction == 0){
+		printf("Thread joined successfully.\n");
+	} else{
+		DieWithError("Thread join failed\n");
+	}
 	printf("Exiting program.\n");
 	close(sock);
+	close(chatSock);
 	exit(0);
 }
 
@@ -354,14 +358,13 @@ void *listenToSocket(void *chatSocket){
 	int socket = (int) chatSocket;
 	int receivedBytes;
 	char chatBuffer[STRINGBUFSIZE];
-	while(1){
+	while(shouldRun){
 		memset(chatBuffer, 0, STRINGBUFSIZE);
-        if((receivedBytes = recv(socket, chatBuffer, STRINGBUFSIZE -1, 0)) <= 0){
-			DieWithError("recv failed or connection closed prematurely");
-		}	
+        recv(socket, chatBuffer, STRINGBUFSIZE -1, 0);
 		chatBuffer[STRINGBUFSIZE] = '\0';
     	printf("msg<- %s\n", chatBuffer);	
 	}
+	printf("Exiting thread");
 }
 
 /* function that returns size of file */

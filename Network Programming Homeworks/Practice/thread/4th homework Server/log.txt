@@ -37,3 +37,96 @@ total 64
 -rw-r--r-- 1 noreebia noreebia  1802 11월 27 21:10 log.txt
 -rwxr-xr-x 1 noreebia noreebia 18240 11월 27 21:05 Server
 
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 41638, Client Chat Port : 55138
+Client has sent chat message 'yo'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Client has sent chat message 'yo'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 41642, Client Chat Port : 55142
+Client has sent chat message 'hey'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55142
+Client has sent chat message 'yoc4'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Client has sent chat message 'yoyoo'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55142
+Client has sent chat message 'aaaaaaaaaaaaaaaaaaa'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Client has sent chat message 'aaaaaaaaaaaaaabbbbbbbbbbbbbbccc'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Client has sent chat message 'cccccccccccddddddddddddd'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Client has sent chat message 'hehehehe'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55142
+Client has sent chat message 'hehehehe'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Client has sent chat message 'heeeheeeheee'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55142
+Client has sent chat message 'yo'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55142
+Client has sent chat message '??'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55138
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41638
+total 44
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13348 11월 28 21:34 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  3991 11월 28 21:38 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:35 Server
+
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41642
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13348 11월 28 21:34 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  4347 11월 28 21:39 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:35 Server
+
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41642
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13348 11월 28 21:34 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  4703 11월 28 21:39 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:35 Server
+
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 41732, Client Chat Port : 55232
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 41736, Client Chat Port : 55236
+Client has sent chat message 'heehee'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55236
+Client has sent chat message 'yomski'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55236
+Client has sent chat message 'yeahc4'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55232
+Client has sent chat message 'yeahbro?'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55232
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41736
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13385 11월 28 21:43 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  5709 11월 28 21:45 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:43 Server
+
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41732
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13385 11월 28 21:43 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  6065 11월 28 21:45 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:43 Server
+
+Sent file 'FtServer.c' to main port of client. Client IP:127.0.0.1, Client Main Port:41732
+Received file 'FtClient.c' from main port of client. Client IP: 127.0.0.1, Client Main Port: 41736
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41736
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13385 11월 28 21:43 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  6611 11월 28 21:46 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:43 Server
+
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41736
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13385 11월 28 21:43 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  6967 11월 28 21:48 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:43 Server
+
+Sent file 'FtServer.c' to main port of client. Client IP:127.0.0.1, Client Main Port:41736
+Sent list of files on server to main port of client. Client IP:127.0.0.1, Client Main Port:41732
+total 48
+-rw-r--r-- 1 noreebia noreebia   116  9월 14 22:35 DieWithError.c
+-rw-r--r-- 1 noreebia noreebia 13385 11월 28 21:43 FtServer.c
+-rw-r--r-- 1 noreebia noreebia  7414 11월 28 21:51 log.txt
+-rwxr-xr-x 1 noreebia noreebia 18240 11월 28 21:43 Server
+
+Sent file 'log.txt' to main port of client. Client IP:127.0.0.1, Client Main Port:41732
+Sent file 'log.txt' to main port of client. Client IP:127.0.0.1, Client Main Port:41732
+Client has disconnected. Client IP:127.0.0.1, Client Main Port:41732, Client Chat Port:55232
+
+Client has disconnected. Client IP:127.0.0.1, Client Main Port:41736, Client Chat Port:55236
+
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 41740, Client Chat Port : 55240
+Client has sent chat message '1080'. Delivering to other clients. Client IP:127.0.0.1, Client Chat Port:55240
+Client has disconnected. Client IP:127.0.0.1, Client Main Port:41740, Client Chat Port:55240
+
+New client has connected. Client IP : 127.0.0.1, Client Main Port : 41744, Client Chat Port : 55244
+Client has disconnected. Client IP:127.0.0.1, Client Main Port:41744, Client Chat Port:55244
+

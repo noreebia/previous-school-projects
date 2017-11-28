@@ -166,6 +166,7 @@ void *HandleTCPClient(void *clientInfo){
 
 	strcpy(clntIP, ((struct ClientInfo*)clientInfo) -> ip);
 
+	printf("New client has connected.\n");
 	printf("Client IP : %s\n", clntIP);
 	printf("Client Main Port : %d\n", clntMainPort);
 	printf("Client Chat Port : %d\n", clntChatPort);
@@ -206,12 +207,6 @@ void *HandleTCPClient(void *clientInfo){
 		if(msgType == EchoReq){
 			totalBytesRcvd = 0;
 
-			/*
-			msgType = EchoRep;
-			if(send(clntSocket, &msgType, 1, 0) != 1)
-				DieWithError("send() sent a different number of bytes than expected");
-			*/
-
 			if((bytesRcvd = recv(clntSocket, echoStringLengthInString, 20, 0)) <0)
 				DieWithError("recv() failed");	
 			
@@ -221,12 +216,7 @@ void *HandleTCPClient(void *clientInfo){
 				while(totalBytesRcvd < echoStringLength){
 					if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE-1, 0)) <0)
 						DieWithError("recv() failed");	
-					printf("Msg<%s\n", stringBuffer);
-					/*
-					if( send(clntSocket, stringBuffer, bytesRcvd,0) != bytesRcvd){
-						DieWithError("send() failed");
-					}
-					*/
+
 					for(int i=0;i<NUMOFCHATSOCKETS;i++){
 						if(chatSockets[i] != 0 && chatSockets[i] != clntChatSocket){
 							if( send(chatSockets[i], stringBuffer, bytesRcvd,0) != bytesRcvd){
@@ -234,23 +224,17 @@ void *HandleTCPClient(void *clientInfo){
 							}				
 						}
 					}
-					printf("Msg>%s\n", stringBuffer);
 					totalBytesRcvd += bytesRcvd;
-
-					sprintf(logBuffer, "Client has sent chat message:%s Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
+					sprintf(logBuffer, "Client has sent chat message '%s'. Delivering to other clients. Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
 					writeLog(logBuffer);
+					printf("%s\n",logBuffer);
 					memset(stringBuffer, 0, BUFSIZE);
 				}
 			}
 			else{	/* if string length does not exceed buffer length */
 				if((bytesRcvd = recv(clntSocket, stringBuffer, BUFSIZE, 0)) <0)
 					DieWithError("recv() failed");	
-				printf("Msg<%s\n", stringBuffer);
-				/*
-				if( send(clntSocket, stringBuffer, bytesRcvd,0) != bytesRcvd){
-					DieWithError("send() failed");
-				}
-				*/
+
 				for(int i=0;i<NUMOFCHATSOCKETS;i++){
 					if(chatSockets[i] != 0 && chatSockets[i] != clntChatSocket){
 						if( send(chatSockets[i], stringBuffer, bytesRcvd,0) != bytesRcvd){
@@ -258,8 +242,9 @@ void *HandleTCPClient(void *clientInfo){
 						}				
 					}
 				}
-				sprintf(logBuffer, "Client has sent chat message:%s Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
+				sprintf(logBuffer, "Client has sent chat message '%s'. Delivering to other clients. Client IP:%s, Client Chat Port:%hu", stringBuffer, clntIP, clntChatPort);
 				writeLog(logBuffer);
+				printf("%s\n",logBuffer);
 			}
 		}
 		
@@ -311,11 +296,11 @@ void *HandleTCPClient(void *clientInfo){
 				memset(fileBuffer, 0, FILEBUFSIZE);
 			}
 			fclose(fp);
-			printf("\n");
+			printf("\n");		
+			printf("%s (%d bytes) successfully received from client\n", fileName, fileSize);
+
 			sprintf(logBuffer, "Received file '%s' from main port of client. Client IP: %s, Client Main Port: %hu", fileName, clntIP, clntMainPort);
 			writeLog(logBuffer);
-		
-			printf("%s (%d bytes) successfully received from client\n", fileName, fileSize);
 
 			printf("Waiting for operation from client...\n\n");
 		}
@@ -369,10 +354,11 @@ void *HandleTCPClient(void *clientInfo){
 			}			
 			fclose(fp);
 			printf("\n");
+			printf("%s (%d bytes) successfully sent to client\n", fileName, fileSize);
+
 			sprintf(logBuffer, "Sent file '%s' to main port of client. Client IP:%s, Client Main Port:%hu", fileName, clntIP, clntMainPort);
 			writeLog(logBuffer);
 
-			printf("%s (%d bytes) successfully sent to client\n", fileName, fileSize);
 			printf("Waiting for operation from client...\n\n");
 		}
 		else if(msgType == ListFilesReq){
@@ -401,7 +387,9 @@ void *HandleTCPClient(void *clientInfo){
 			printf("Waiting for operation from client...\n\n");
 		}
 	}
-	printf("Client has disconnected.\nClosing socket.\n");
+	sprintf(logBuffer, "Client has disconnected. Client IP:%s, Client Main Port:%hu, Client Chat Port:%hu\n", clntIP, clntMainPort, clntChatPort);
+	writeLog(logBuffer);
+	printf("%s\n",logBuffer);
 	for(int i=0; i<NUMOFCHATSOCKETS;i++){
 		if(chatSockets[i] == clntChatSocket){
 			printf("changed sockets back to 0\n");
@@ -409,6 +397,7 @@ void *HandleTCPClient(void *clientInfo){
 			break;
 		}
 	}
+	printf("Closing Socket.\n");
 	close(clntChatSocket);
 	close(clntSocket);
 }
