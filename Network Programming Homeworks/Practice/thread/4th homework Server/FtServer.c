@@ -36,7 +36,7 @@ struct ClientInfo{
 };
 
 int chatSockets[NUMOFCHATSOCKETS] = {0};
-int connectionCount = 0;
+int connectedClientCount = 0;
 
 int main(int argc, char *argv[])
 {
@@ -105,12 +105,19 @@ int main(int argc, char *argv[])
 			DieWithError("accept() failed");
 
 
-		if(connectionCount >= (NUMOFCHATSOCKETS)){
+		if(connectedClientCount >= (NUMOFCHATSOCKETS)){
 			if(send(clientFTPSocket, "overcapacity", strlen("overcapacity"), 0) != strlen("overcapacity"))
 				DieWithError("send() failed");
 		}else{
-			chatSockets[connectionCount] = clientChatSocket;
-			connectionCount++;
+			//chatSockets[connectedClientCount] = clientChatSocket;
+			for(int i=0; i<NUMOFCHATSOCKETS;i++){
+				if(chatSockets[i] == 0){
+					chatSockets[i] = clientChatSocket;
+					printf("%d is now %d", i, clientChatSocket);
+					break;
+				}
+			}
+			connectedClientCount++;
 
 			struct ClientInfo *newClientInfo = (struct ClientInfo*) malloc(sizeof(struct ClientInfo));
 
@@ -386,11 +393,12 @@ void *HandleTCPClient(void *clientInfo){
 	printf("%s\n",logBuffer);
 	for(int i=0; i<NUMOFCHATSOCKETS;i++){
 		if(chatSockets[i] == clntChatSocket){
-			printf("changed sockets back to 0\n");
+			printf("changed socket back to 0\n");
 			chatSockets[i] = 0;
 			break;
 		}
 	}
+	connectedClientCount--;
 	printf("Closing Socket.\n");
 	close(clntChatSocket);
 	close(clntFTPSocket);
